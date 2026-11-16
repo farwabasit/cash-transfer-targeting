@@ -65,6 +65,7 @@ models:
           - in_range: {min_value: 0, max_value: 1}
 
   - name: gld_household_spending
+    description: Endline spending per person per month by spending group (PPP $), one row per household and group.
     tests:
       - unique_combination: {columns: [country, household_id, spend_group]}
     columns:
@@ -73,6 +74,7 @@ models:
           - in_range: {min_value: 0}
 
   - name: gld_spending_by_type
+    description: Where the money went. Average spending per person with and without cash, by country, type and group.
     tests:
       - unique_combination: {columns: [country, household_type, spend_group]}
 

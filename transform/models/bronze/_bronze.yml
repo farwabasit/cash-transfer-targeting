@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: brz_kenya_uct
+    description: Raw Kenya file as a view. 2 rows per household (female and male respondent), fixed in silver.
+  - name: brz_uganda_baseline
+    description: Raw Uganda baseline survey (Sep-Nov 2019) as a view.
+  - name: brz_uganda_endline
+    description: Raw Uganda endline survey (Feb-Apr 2022) as a view. BL_ONLY = 1 marks households not found at endline.
+  - name: brz_graduation_pooled_hh
+    description: Raw graduation programme file (6 countries) as a view.
