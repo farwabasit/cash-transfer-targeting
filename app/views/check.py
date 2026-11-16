@@ -10,13 +10,13 @@ st.markdown(
     "within your budget."
 )
 
-REQUIRED = ["household_id", "country", "consumption_pc_ppp", "hh_size"]
+REQUIRED = ["household_id", "country", "consumption_pc", "hh_size"]
 with st.expander("File format"):
     st.markdown(
         "A CSV with one row per household and these columns:\n"
         "- `household_id`: your own ID\n"
         "- `country`: `KEN` or `UGA` (the context the results come from)\n"
-        "- `consumption_pc_ppp`: monthly consumption per person in PPP dollars\n"
+        "- `consumption_pc`: monthly consumption per person (PPP dollars or your local currency, you choose below)\n"
         "- `hh_size`: number of people in the household"
     )
     st.download_button("Download an example file (real trial households)",
@@ -35,14 +35,15 @@ else:
     hh = data.sample_households()
 
 hh.columns = [c.strip().lower() for c in hh.columns]
+hh = hh.rename(columns={"consumption_pc_ppp": "consumption_pc"})  # older example files
 missing = [c for c in REQUIRED if c not in hh.columns]
 if missing:
     st.error(f"Missing columns: {', '.join(missing)}")
     st.stop()
 hh["country"] = hh.country.astype(str).str.upper().str.strip()
-for c in ["consumption_pc_ppp", "hh_size"]:
+for c in ["consumption_pc", "hh_size"]:
     hh[c] = pd.to_numeric(hh[c], errors="coerce")
-bad = hh[~hh.country.isin(data.COUNTRY_NAMES) | hh.consumption_pc_ppp.isna() | (hh.hh_size < 1) | hh.hh_size.isna()]
+bad = hh[~hh.country.isin(data.COUNTRY_NAMES) | hh.consumption_pc.isna() | (hh.hh_size < 1) | hh.hh_size.isna()]
 if len(bad):
     st.warning(f"{len(bad)} rows skipped (unknown country, missing consumption or household size below 1).")
     hh = hh.drop(bad.index)
@@ -50,17 +51,20 @@ if hh.empty:
     st.error("No usable rows.")
     st.stop()
 
+cur, rate = data.currency_inputs("check")
+hh["consumption_pc_ppp"] = hh.consumption_pc / rate
+
 countries = sorted(hh.country.unique())
 c1, c2, c3 = st.columns(3)
 with c1:
     code = st.selectbox("Context", countries, format_func=data.COUNTRY_NAMES.get,
-                        help="Results from the two countries use different price bases, so one at a time.")
+                        help="Results from the two countries use different price bases. Pick one at a time.")
 amounts = data.transfer_amounts()
-default_transfer = float(amounts[amounts.country == code].amount_ppp.min())
+default_transfer = round(float(amounts[amounts.country == code].amount_ppp.min()) * rate, 0)
 with c2:
-    transfer = st.number_input("Transfer per household (PPP $)", min_value=50.0, value=default_transfer, step=50.0)
+    transfer = st.number_input(f"Transfer per household ({cur})", min_value=1.0, value=default_transfer, step=50.0)
 with c3:
-    budget = st.number_input("Budget (PPP $)", min_value=0.0, value=float(transfer * 10), step=1000.0,
+    budget = st.number_input(f"Budget ({cur})", min_value=0.0, value=float(transfer * 10), step=1000.0,
                              help="Default: enough for 10 households.")
 priority = st.radio("Who should come first?", ["Most impact per dollar", "Poorest first"], horizontal=True)
 
@@ -77,7 +81,8 @@ hh.loc[~poorer & ~larger, "type"] = "C"
 hh.loc[~poorer & larger, "type"] = "D"
 hh["type_label"] = hh.type.map(eff.label)
 hh["gain_pc"] = hh.type.map(eff.effect_pc)
-hh["gain_household"] = hh.gain_pc * hh.hh_size
+# effects are in PPP $, convert back to the chosen currency for display
+hh["gain_household"] = hh.gain_pc * hh.hh_size * rate
 hh["gain_per_100"] = 100 * hh.gain_household / transfer
 hh["uncertain"] = hh.type.map(eff.ci_low <= 0)
 
@@ -93,23 +98,23 @@ hh["rank"] = range(1, len(hh) + 1)
 sel = hh[hh.selected]
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("Households funded", f"{len(sel)} of {len(hh)}")
-m2.metric("Cost", f"${len(sel) * transfer:,.0f}")
-m3.metric("Extra consumption", f"${sel.gain_household.sum():,.0f}/mo",
+m2.metric("Cost", f"{len(sel) * transfer:,.0f} {cur}")
+m3.metric("Extra consumption", f"{sel.gain_household.sum():,.0f} {cur}/mo",
           help="Sum over funded households of the type's average gain x household size.")
 m4.metric("From the poorest half", f"{(sel.consumption_pc_ppp < med.median_consumption_pc_bl).mean():.0%}" if len(sel) else "-")
 
-st.dataframe(hh[["rank", "selected", "household_id", "consumption_pc_ppp", "hh_size", "type", "type_label",
+st.dataframe(hh[["rank", "selected", "household_id", "consumption_pc", "hh_size", "type", "type_label",
                  "gain_household", "gain_per_100", "uncertain"]],
              hide_index=True, width="stretch", column_config={
                  "rank": "Rank", "selected": "Funded", "household_id": "Household",
-                 "consumption_pc_ppp": st.column_config.NumberColumn("Consumption / person", format="$%.0f"),
+                 "consumption_pc": st.column_config.NumberColumn(f"Consumption / person ({cur})", format="%.0f"),
                  "hh_size": "People", "type": "Type", "type_label": "Household type",
-                 "gain_household": st.column_config.NumberColumn("Expected gain / month", format="$%.1f"),
-                 "gain_per_100": st.column_config.NumberColumn("Per $100", format="$%.2f"),
+                 "gain_household": st.column_config.NumberColumn(f"Expected gain / month ({cur})", format="%.1f"),
+                 "gain_per_100": st.column_config.NumberColumn(f"Gain per 100 {cur} given", format="%.2f"),
                  "uncertain": st.column_config.CheckboxColumn("Uncertain", help="The trial's range for this type includes zero.")})
 st.download_button("Download the ranked list", hh.to_csv(index=False), f"ranked_households_{code}.csv", "text/csv")
 st.caption(
     "Expected gains are averages for each type from the trials, not a promise for a single household. "
     "Types marked uncertain had a range that includes zero. The trials also showed that results from one "
-    "country don't carry over to another, so use the context closest to your programme, and ideally your own data."
+    "country don't carry over to another. Use the context closest to your programme, or better your own data."
 )

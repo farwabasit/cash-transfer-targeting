@@ -15,6 +15,21 @@ COUNTRY_COLORS = {"Kenya": "#2a78d6", "Uganda": "#1baf7a"}
 CONTROL_GREY = "#9a9893"
 
 
+def currency_inputs(key):
+    """lets an NGO work in its own currency. returns (currency label, local units per PPP $)"""
+    mode = st.radio("Money in my file is in", ["PPP dollars", "Local currency"], horizontal=True, key=f"{key}_mode",
+                    help="PPP dollars make prices comparable between countries. If your data is in SEK, KES, UGX "
+                         "etc, pick local currency and give the conversion rate.")
+    if mode == "PPP dollars":
+        return "PPP $", 1.0
+    c1, c2 = st.columns(2)
+    code = c1.text_input("Currency", value="KES", max_chars=5, key=f"{key}_cur").strip().upper() or "LCU"
+    rate = c2.number_input(f"{code} per PPP dollar", min_value=0.0001, value=45.0, step=1.0, key=f"{key}_rate",
+                           help="The World Bank publishes this as 'PPP conversion factor, private consumption' "
+                                "(PA.NUS.PRVT.PP) for every country and year.")
+    return code, float(rate)
+
+
 def question_box(text):
     # the yellow "stakeholder question" box from my Apollo deck
     st.markdown(
@@ -87,10 +102,20 @@ def transfer_amounts():
     return query("select * from SEEDS.TRANSFER_AMOUNTS")
 
 
+def example_programme():
+    # real Uganda trial households in the format the "own programme" page expects
+    return query("""
+        select household_id, treated, round(consumption_pc_bl, 4) as consumption_before,
+               round(consumption_pc_el, 4) as consumption_after, hh_size_bl as hh_size
+        from GOLD.GLD_HOUSEHOLD_OUTCOMES
+        where country = 'UGA' and in_analysis and household_type is not null and consumption_pc_el_w is not null
+        order by household_id""").drop(columns="country_name", errors="ignore")
+
+
 def sample_households(n_per_country=25):
     # real households from the trials (baseline values only), as an example upload file
     return query(f"""
-        select household_id, country, round(consumption_pc_bl_w, 2) as consumption_pc_ppp, hh_size_bl as hh_size
+        select household_id, country, round(consumption_pc_bl_w, 2) as consumption_pc, hh_size_bl as hh_size
         from GOLD.GLD_HOUSEHOLD_OUTCOMES
         where in_analysis and household_type is not null
         qualify row_number() over (partition by country order by hash(household_id)) <= {n_per_country}

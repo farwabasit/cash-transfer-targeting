@@ -6,7 +6,7 @@ import data
 st.title("Which Rule Gives the Most per Dollar?")
 st.markdown(
     "Imagine the budget covers **30% of the eligible households**. Which rule should decide who gets cash? "
-    "Each rule picks its 30%, and we measure the real gain for those households (treatment vs control, "
+    "Each rule picks its 30% and we measure the real gain for those households (treatment vs control, "
     "which works because the trials were randomised). Rules that use estimates were learned on one part "
     "of the data and tested on another."
 )

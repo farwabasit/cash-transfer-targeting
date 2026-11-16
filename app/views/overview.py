@@ -13,17 +13,17 @@ data.question_box(
 
 st.subheader("Who Is This For?")
 st.markdown(
-    "**Programme managers and funders of cash programmes** (NGOs like GiveDirectly, Rädda Barnen, the Red Cross, "
-    "and funders like Sida, Postkodlotteriet and the IKEA Foundation).\n\n"
-    "- **Before:** they choose households by need only, and can't say what each $100 achieves for different households.\n"
-    "- **With this tool:** they see which household types gain most, what the trade-off with reaching the poorest is, "
-    "and can rank their own household list within their budget."
+    "**Programme managers and funders of cash programmes** (NGOs like GiveDirectly, Rädda Barnen and the Red Cross. "
+    "Funders like Sida, Postkodlotteriet and the IKEA Foundation).\n\n"
+    "- **Before:** they choose households by need only and can't say what each $100 achieves for different households.\n"
+    "- **With this tool:** they see which household types gain most, what the trade-off with reaching the poorest is "
+    "and they can rank their own household list within their budget."
 )
 
 st.subheader("Supporting Questions")
 st.markdown(
-    "- How much does cash raise consumption, and what does each $100 buy?\n"
-    "- Which types of households gain the most, and is it the same everywhere?\n"
+    "- How much does cash raise consumption and what does each $100 buy?\n"
+    "- Which types of households gain the most? Is it the same everywhere?\n"
     "- What do households spend the extra money on?\n"
     "- If we target the households that gain most, what happens to the poorest?"
 )
@@ -55,7 +55,7 @@ st.caption("Measure: monthly consumption per person in PPP dollars (food, fuel, 
 
 st.subheader("Data Quality Checks")
 st.dataframe(pd.DataFrame([
-    ["Kenya: 2 rows per household", "1,440", "One row per respondent (wife and husband). Only the wellbeing scores differ, so we keep one row."],
+    ["Kenya: 2 rows per household", "1,440", "One row per respondent (wife and husband). Only the wellbeing scores differ. We keep one row."],
     ["Kenya: pure control has no baseline", "432", "These villages were only surveyed at the end. The file stored 0, we set it to missing and use the untreated households in treated villages as control."],
     ["Uganda: food list changed between surveys", "12 items", "Rice and pineapple added, 'other' groups removed. Fine for cash vs no cash, risky for before vs after."],
     ["Uganda: very high values per person", "4", "One-person households with very high spending. Capped at the top 1%."],
@@ -75,7 +75,7 @@ st.markdown(
 
 st.subheader("Recommendations")
 st.markdown(
-    "- **Use your own local data:** who benefits depends on the context, so run the pipeline on your own baseline survey.\n"
+    "- **Use your own local data:** who benefits depends on the context. Run the pipeline on your own baseline survey.\n"
     "- **Decide the trade-off openly:** more impact per dollar or reaching the poorest first. Show both numbers to the board.\n"
     "- **Use simple types, not single scores:** type rules are easy to explain and a machine learning model agreed with them."
 )

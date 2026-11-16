@@ -1,11 +1,11 @@
 # Cash Transfer Targeting
 
-Which types of poor households gain the most from unconditional cash transfers, and how can a programme with a fixed budget reach more people out of poverty?
+Which types of poor households gain the most from unconditional cash transfers? How can a programme with a fixed budget reach more people out of poverty?
 
 > **Status:** in development (final individual project, Data Analyst programme, Hyper Island, Nov 2026).
 
 ## The problem
-NGOs and funders that give unconditional cash transfers have a fixed budget and more eligible households than they can reach. This project uses open data from randomised GiveDirectly trials in Kenya (2011-12) and Uganda (2019-22) to group households into a few explainable types, measure how much each type gains from cash, and turn that into a targeting tool for programme teams.
+NGOs and funders that give unconditional cash transfers have a fixed budget and more eligible households than they can reach. This project uses open data from randomised GiveDirectly trials in Kenya (2011-12) and Uganda (2019-22) to group households into a few explainable types. It measures how much each type gains from cash and turns that into a targeting tool for programme teams.
 
 ## Architecture
 ```
@@ -17,7 +17,7 @@ Dataverse files (.dta) ──► Python loader (Docker) ──► Snowflake RAW
 Orchestration: GitHub Actions schedule (Airflow DAG with Cosmos for local runs)
 ```
 
-The pipeline is **designed for new survey waves**: every file is loaded once (tracked by hash in `RAW._LOAD_LOG`), and new columns in a later wave are added to the table instead of breaking the load.
+The pipeline is **designed for new survey waves**: every file is loaded once (tracked by hash in `RAW._LOAD_LOG`). New columns in a later wave are added to the table instead of breaking the load.
 
 ## Repository layout
 | Folder | What |

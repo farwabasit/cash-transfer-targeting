@@ -43,7 +43,7 @@ st.dataframe(sp.sort_values("extra_spend_pc_ppp", ascending=False)[
 
 notes = {
     "KEN": "Most of the extra money went to food. Spending on alcohol and tobacco went slightly down, not up.",
-    "UGA": "Food first, then transport/phone and energy/water. Very little went to alcohol. Education is "
+    "UGA": "Food first. Then transport/phone and energy/water. Very little went to alcohol. Education is "
            "close to zero because the endline (early 2022) came right after Uganda's long COVID school closures.",
 }
 st.info(notes[code])
