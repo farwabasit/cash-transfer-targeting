@@ -22,6 +22,9 @@ c2.metric("Data tests", "61")
 c3.metric("Seeds", "7")
 c4.metric("Contracts", "3")
 
+st.page_link("views/dbt_docs.py", label="Open the data catalogue with the lineage graph (dbt docs)",
+             icon=":material/menu_book:")
+
 st.subheader("What Each Layer Does")
 st.dataframe(pd.DataFrame([
     ["Raw", "4 survey files land as they are (one read straight from a zip), plus lineage columns (file, hash, wave, loaded at). A load log "
