@@ -1,14 +1,11 @@
-"""Land raw survey files in Snowflake RAW, incrementally.
+"""Loads the raw survey files (listed in sources.yml) into Snowflake RAW.
 
-- Each file is loaded once: its SHA-256 hash is recorded in RAW._LOAD_LOG and skipped next time.
-- Schema drift: columns that appear in a new file are added to the existing table;
-  columns missing from a new file are left NULL.
-- Every row gets lineage columns: _DATASET, _WAVE, _SOURCE_FILE, _FILE_HASH, _LOADED_AT.
+Files already loaded are skipped (hash kept in RAW._LOAD_LOG). If a new wave has
+extra columns they get added to the table.
 
-Usage:
-    python ingestion/load_raw.py --dry-run     # read files and show the plan, no Snowflake
-    python ingestion/load_raw.py               # load new files
-    python ingestion/load_raw.py --force       # reload everything (replaces earlier rows of the same file)
+    python ingestion/load_raw.py --dry-run
+    python ingestion/load_raw.py
+    python ingestion/load_raw.py --force   # reload
 """
 import argparse
 import hashlib
@@ -26,7 +23,7 @@ LOG_TABLE = "_LOAD_LOG"
 
 
 def load_dotenv(path: Path) -> None:
-    """Minimal .env reader so local runs need no extra package (Docker uses --env-file)."""
+    # simple .env reader, docker passes --env-file instead
     if not path.exists():
         return
     for line in path.read_text(encoding="utf-8").splitlines():
@@ -46,14 +43,14 @@ def file_hash(path: Path) -> str:
 
 def read_file(path: Path) -> pd.DataFrame:
     if path.suffix.lower() == ".dta":
-        # keep numeric codes; value labels are documented in the questionnaires
+        # keep the codes, labels are in the questionnaires
         df = pd.read_stata(path, convert_categoricals=False)
     elif path.suffix.lower() == ".csv":
         df = pd.read_csv(path)
     else:
         raise ValueError(f"Unsupported file type: {path.suffix}")
     df.columns = [c.strip().upper() for c in df.columns]
-    return df.copy()  # read_stata returns a fragmented frame; copy makes adding columns fast
+    return df.copy()  # avoids pandas fragmentation warning
 
 
 def snowflake_type(dtype) -> str:
@@ -72,9 +69,10 @@ def connect():
     import snowflake.connector
     from cryptography.hazmat.primitives import serialization
 
-    if os.environ.get("SNOWFLAKE_PRIVATE_KEY"):            # CI: key content in a secret
+    # github actions passes the key itself, locally we read the file
+    if os.environ.get("SNOWFLAKE_PRIVATE_KEY"):
         pem = os.environ["SNOWFLAKE_PRIVATE_KEY"].encode()
-    else:                                                  # local / Docker: key file
+    else:
         key_path = Path(os.environ["SNOWFLAKE_PRIVATE_KEY_PATH"]).expanduser()
         if not key_path.is_absolute():
             key_path = ROOT / key_path
@@ -125,7 +123,7 @@ def load_one(conn, src: dict, df: pd.DataFrame, digest: str, force: bool) -> str
             cur.execute(f"DELETE FROM {SCHEMA}.{LOG_TABLE} WHERE FILE_HASH = %s AND TARGET_TABLE = %s",
                         (digest, table))
         new_cols = [c for c in df.columns if c not in cols]
-        for c in new_cols:                                  # schema drift: add, don't fail
+        for c in new_cols:  # new columns in this wave
             cur.execute(f'ALTER TABLE {SCHEMA}."{table}" ADD COLUMN "{c}" {snowflake_type(df[c].dtype)}')
 
     ok, _, nrows, _ = write_pandas(conn, df, table, schema=SCHEMA, auto_create_table=not cols,
@@ -141,9 +139,9 @@ def load_one(conn, src: dict, df: pd.DataFrame, digest: str, force: bool) -> str
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--dry-run", action="store_true", help="read files and print the plan only")
-    ap.add_argument("--force", action="store_true", help="reload files that were already loaded")
+    ap = argparse.ArgumentParser(description="Load raw survey files into Snowflake")
+    ap.add_argument("--dry-run", action="store_true", help="only read the files, don't connect")
+    ap.add_argument("--force", action="store_true", help="reload files even if already loaded")
     ap.add_argument("--sources", default=str(ROOT / "ingestion" / "sources.yml"))
     args = ap.parse_args()
 
