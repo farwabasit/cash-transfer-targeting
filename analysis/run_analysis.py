@@ -286,6 +286,48 @@ def pooled(cash, grad):
     return by_place, pd.DataFrame(meta)
 
 
+def lump_vs_monthly(conn):
+    """GiveDirectly asked: lump sum or monthly payments, for which households?
+    kenya randomised this among the $404 transfers (the large transfers were all monthly, so left out).
+    compared with the control group and with each other, for consumption and assets, all and by poverty half"""
+    df = pd.read_sql("""
+        select o.household_id, o.treated, o.household_type, o.consumption_pc_bl_w, o.consumption_pc_el_w,
+               h.lump_sum, h.large_transfer, h.asset_value_bl, h.asset_value_el
+        from GOLD.GLD_HOUSEHOLD_OUTCOMES o
+        join SILVER.SLV_KENYA_HOUSEHOLDS h on h.household_id = o.household_id
+        where o.country = 'KEN' and o.in_analysis and o.household_type is not null
+          and o.consumption_pc_el_w is not null
+          and (o.treated = 0 or not h.large_transfer)""", conn)
+    df.columns = [c.lower() for c in df.columns]
+    df["lump"] = ((df.treated == 1) & (df.lump_sum == True)).astype(int)  # noqa: E712
+    df["monthly"] = ((df.treated == 1) & (df.lump_sum == False)).astype(int)  # noqa: E712
+    df["poorer"] = df.household_type.isin(["A", "B"])
+    for c in ["asset_value_bl", "asset_value_el"]:
+        df[c] = df[c].clip(upper=df[c].quantile(0.99))
+    outcomes = {"Consumption per person per month": ("consumption_pc_el_w", "consumption_pc_bl_w"),
+                "Household assets": ("asset_value_el", "asset_value_bl")}
+    rows = []
+    for outcome, (y, ybl) in outcomes.items():
+        for group, g in [("All households", df), ("Poorer half", df[df.poorer]), ("Less poor half", df[~df.poorer])]:
+            g = g.dropna(subset=[y, ybl])
+            m = _ols(g[y], g[["lump", "monthly", ybl]])
+            V = m.cov_params()
+            bl, bm = m.params["lump"], m.params["monthly"]
+            diff = bl - bm
+            se_diff = np.sqrt(V.loc["lump", "lump"] + V.loc["monthly", "monthly"] - 2 * V.loc["lump", "monthly"])
+            ctrl = g.loc[g.treated == 0, y].mean()
+            from scipy import stats
+            rows.append(dict(
+                outcome=outcome, group=group, n_lump=int(g.lump.sum()), n_monthly=int(g.monthly.sum()),
+                n_control=int((g.treated == 0).sum()), control_mean=ctrl,
+                lump_effect=bl, lump_pct=bl / ctrl, lump_ci_low=bl - 1.96 * m.bse["lump"], lump_ci_high=bl + 1.96 * m.bse["lump"],
+                monthly_effect=bm, monthly_pct=bm / ctrl,
+                monthly_ci_low=bm - 1.96 * m.bse["monthly"], monthly_ci_high=bm + 1.96 * m.bse["monthly"],
+                lump_minus_monthly=diff, diff_ci_low=diff - 1.96 * se_diff, diff_ci_high=diff + 1.96 * se_diff,
+                diff_p_value=2 * (1 - stats.norm.cdf(abs(diff / se_diff)))))
+    return pd.DataFrame(rows)
+
+
 def write(conn, tables):
     from snowflake.connector.pandas_tools import write_pandas
     conn.cursor().execute("create schema if not exists ML")
@@ -317,6 +359,7 @@ def main():
     tables["GRADUATION_EFFECTS"] = grad_effects
     tables["POORER_VS_LESS_POOR"] = poorer_vs_less_poor(df, grad)
     tables["POOLED_BY_PLACE"], tables["POOLED_META"] = pooled(df, grad)
+    tables["LUMP_VS_MONTHLY"] = lump_vs_monthly(conn)
     pd.set_option("display.width", 220)
     for k, v in tables.items():
         if k != "HOUSEHOLD_CATE":

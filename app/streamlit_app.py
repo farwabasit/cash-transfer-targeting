@@ -11,6 +11,7 @@ pages = [
     st.Page("views/who_gains.py", title="Who gains most", icon=":material/groups:"),
     st.Page("views/spending.py", title="Where the money went", icon=":material/shopping_basket:"),
     st.Page("views/budget.py", title="Budget trade-off", icon=":material/balance:"),
+    st.Page("views/lump_monthly.py", title="Lump sum or monthly?", icon=":material/payments:"),
     st.Page("views/more_countries.py", title="Eight places compared", icon=":material/public:"),
     st.Page("views/check.py", title="Check my households", icon=":material/upload_file:"),
     st.Page("views/own_programme.py", title="Analyse my own programme", icon=":material/insights:"),

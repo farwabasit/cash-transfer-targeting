@@ -124,6 +124,14 @@ models:
         data_type: number
       - name: consumption_missing_bl
         data_type: boolean
+      - name: asset_value_bl
+        data_type: float
+        tests:
+          - in_range: {arguments: {min_value: 0}}
+      - name: asset_value_el
+        data_type: float
+        tests:
+          - in_range: {arguments: {min_value: 0}}
 
   - name: slv_kenya_household_consumption
     description: One row per Kenya household x wave with monthly consumption in PPP dollars (as published).

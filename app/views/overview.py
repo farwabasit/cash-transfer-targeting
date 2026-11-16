@@ -17,7 +17,10 @@ st.markdown(
     "Funders like Sida, Postkodlotteriet and the IKEA Foundation).\n\n"
     "- **Before:** they choose households by need only and can't say what each $100 achieves for different households.\n"
     "- **With this tool:** they see which household types gain most, what the trade-off with reaching the poorest is "
-    "and they can rank their own household list within their budget."
+    "and they can rank their own household list within their budget.\n\n"
+    "Most useful for programmes that **choose households from lists** (refugees, disaster survivors, partner lists or "
+    "machine learning). Programmes that enrol whole poor villages can use it to **check their own results** and to "
+    "choose between a lump sum and monthly payments."
 )
 
 st.subheader("Supporting Questions")
@@ -65,15 +68,16 @@ st.dataframe(pd.DataFrame([
 
 st.subheader("Insights")
 st.markdown(
+    "- **Reaching the poorest costs no impact on average:** across 8 places and 11,522 households the poorer half "
+    "gained as much as the less poor half (gap about 1 point). Only Uganda differed clearly.\n"
     "- **Cash works in both places:** consumption per person +17% in Kenya and +13% in Uganda.\n"
+    "- **Lump sum or monthly:** both raise spending about the same, a lump sum builds more assets (Kenya).\n"
     "- **In Uganda the less poor gained most:** +21% and +27% for the less poor types. In Kenya the poorer, larger "
     "households gained +27%, but the difference with the less poor is not clear.\n"
     "- **Targeting by type pays off in Uganda:** $11.80 extra per month for every $100, against about $2 when "
     "picking at random.\n"
     "- **But it skips the poorest:** only 19% of the households it picks come from the poorest half.\n"
-    "- **A model from one country doesn't work in the other:** Kenya's model could not find Uganda's top gainers.\n"
-    "- **Across 8 places the poorest gain as much as the less poor:** combining 11,522 households in two cash trials "
-    "and six graduation countries, the gap is about 1 point. Only Uganda differed clearly."
+    "- **A model from one country doesn't work in the other:** Kenya's model could not find Uganda's top gainers."
 )
 
 st.subheader("Recommendations")
