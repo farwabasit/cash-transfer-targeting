@@ -24,5 +24,10 @@ sources:
         columns:
           - name: HHID_RAND
             tests: [not_null, unique]
+      - name: GRADUATION_POOLED_HH
+        description: Graduation programme in 6 countries (Banerjee et al. 2015), one row per household, wide (_BSL, _END, _FUP). COUNTRY 5 = Pakistan
+        columns:
+          - name: ID
+            tests: [not_null, unique]
       - name: _LOAD_LOG
         description: One row per loaded file (hash, rows, new columns) for incremental loads

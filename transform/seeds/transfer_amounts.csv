@@ -2,3 +2,5 @@ country,transfer_size,amount_ppp,source
 KEN,small,404,Haushofer & Shapiro (2016) QJE: USD 404 PPP
 KEN,large,1525,Haushofer & Shapiro (2016) QJE: USD 1525 PPP
 UGA,standard,2848.29,"USD 1000 (IDinsight endline report) x 3718.25 UGX/USD (World Bank PA.NUS.FCRF 2020) / 1305.44 UGX per PPP $ (2022, same as endline consumption)"
+PAK,direct_transfer,2048.15,"Banerjee et al. (2015) cost table: asset 1043.33 + food stipend 910.95, 2014 USD PPP"
+PAK,total_cost,5150.14,"Banerjee et al. (2015) cost table: total cost per participant incl. staff and training, 2014 USD PPP"

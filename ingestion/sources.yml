@@ -16,3 +16,11 @@ sources:
     wave: endline_2022
     path: data/raw/uganda_givedirectly_2019_2022/endline_anonymized.dta
     table: UGANDA_ENDLINE
+
+  # graduation programme, 6 countries (Banerjee et al. 2015), read straight from the zip.
+  # silver keeps Pakistan only
+  - dataset: graduation_6country
+    wave: pooled_bsl_end_fup
+    path: data/raw/graduation_6country_2007_2014/data_original.zip
+    member: data_original/pooled_hh.dta
+    table: GRADUATION_POOLED_HH

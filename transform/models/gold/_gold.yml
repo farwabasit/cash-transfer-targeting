@@ -75,3 +75,12 @@ models:
   - name: gld_spending_by_type
     tests:
       - unique_combination: {columns: [country, household_type, spend_group]}
+
+  - name: gld_pakistan_outcomes
+    description: Pakistan households with poverty group (poorer / less poor half) and capped consumption.
+    columns:
+      - name: household_id
+        tests: [unique, not_null]
+      - name: poverty_group
+        tests:
+          - accepted_values: {values: [poorer, less_poor]}

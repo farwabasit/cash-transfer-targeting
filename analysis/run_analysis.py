@@ -173,6 +173,31 @@ def budget_simulation(df, cate):
     return pd.DataFrame(rows)
 
 
+PAK_HH_SIZE = {"end": 6.29, "fup": 6.58}   # average household size, Banerjee et al. (2015) cost table
+PAK_COST = {"direct_transfer": 2048.15, "total_cost": 5150.14}
+
+
+def pakistan(conn):
+    """graduation programme in pakistan: effect at ~2 years (end) and ~3 years (fup), all and by poverty half"""
+    df = pd.read_sql("select * from GOLD.GLD_PAKISTAN_OUTCOMES", conn)
+    df.columns = [c.lower() for c in df.columns]
+    rows = []
+    for wave in ["end", "fup"]:
+        d = df[df[f"consumption_pc_{wave}_w"].notna()]
+        for group, g in [("ALL", d)] + sorted(d.groupby("poverty_group")):
+            X = sm.add_constant(g[["treated", "consumption_pc_bl_w"]].astype(float))
+            m = sm.OLS(g[f"consumption_pc_{wave}_w"].astype(float), X).fit(cov_type="HC1")
+            b, se = m.params["treated"], m.bse["treated"]
+            ctrl = g.loc[g.treated == 0, f"consumption_pc_{wave}_w"].mean()
+            rows.append(dict(
+                wave={"end": "about 2 years", "fup": "about 3 years"}[wave], group=group, n=len(g),
+                n_treatment=int(g.treated.sum()), effect_pc=b, se=se, ci_low=b - 1.96 * se, ci_high=b + 1.96 * se,
+                p_value=m.pvalues["treated"], control_mean=ctrl, effect_pct=b / ctrl,
+                gain_per_100_transfer=100 * b * PAK_HH_SIZE[wave] / PAK_COST["direct_transfer"],
+                gain_per_100_total_cost=100 * b * PAK_HH_SIZE[wave] / PAK_COST["total_cost"]))
+    return pd.DataFrame(rows)
+
+
 def write(conn, tables):
     from snowflake.connector.pandas_tools import write_pandas
     conn.cursor().execute("create schema if not exists ML")
@@ -199,6 +224,7 @@ def main():
         "TYPE_CHECK": type_check(cate),
         "TRANSFER_CHECK": transfer_check(df),
         "BUDGET_SIMULATION": budget_simulation(df, cate),
+        "PAKISTAN_EFFECTS": pakistan(conn),
     }
     pd.set_option("display.width", 220)
     for k, v in tables.items():

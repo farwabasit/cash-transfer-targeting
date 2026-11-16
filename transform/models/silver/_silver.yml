@@ -141,3 +141,16 @@ models:
       - name: food_share
         tests:
           - in_range: {min_value: 0, max_value: 1}
+
+  # pakistan
+  - name: slv_pakistan_households
+    description: Pakistan households from the graduation programme data (not cash). Consumption in 2014 USD PPP.
+    columns:
+      - name: household_id
+        tests: [unique, not_null]
+      - name: treated
+        tests:
+          - accepted_values: {values: [0, 1], quote: false}
+      - name: consumption_pc_bl
+        tests:
+          - in_range: {min_value: 0}

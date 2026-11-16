@@ -9,8 +9,10 @@ extra columns they get added to the table.
 """
 import argparse
 import hashlib
+import io
 import os
 import sys
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -33,22 +35,23 @@ def load_dotenv(path: Path) -> None:
             os.environ.setdefault(k.strip(), v.strip())
 
 
-def file_hash(path: Path) -> str:
-    h = hashlib.sha256()
-    with path.open("rb") as f:
-        for chunk in iter(lambda: f.read(1 << 20), b""):
-            h.update(chunk)
-    return h.hexdigest()
+def open_source(src: dict) -> tuple[bytes, str]:
+    """returns the file's bytes and a name. 'member' reads one file straight out of a zip."""
+    path = ROOT / src["path"]
+    if src.get("member"):
+        with zipfile.ZipFile(path) as z:
+            return z.read(src["member"]), Path(src["member"]).name
+    return path.read_bytes(), path.name
 
 
-def read_file(path: Path) -> pd.DataFrame:
-    if path.suffix.lower() == ".dta":
+def read_file(blob: bytes, name: str) -> pd.DataFrame:
+    if name.lower().endswith(".dta"):
         # keep the codes, labels are in the questionnaires
-        df = pd.read_stata(path, convert_categoricals=False)
-    elif path.suffix.lower() == ".csv":
-        df = pd.read_csv(path)
+        df = pd.read_stata(io.BytesIO(blob), convert_categoricals=False)
+    elif name.lower().endswith(".csv"):
+        df = pd.read_csv(io.BytesIO(blob))
     else:
-        raise ValueError(f"Unsupported file type: {path.suffix}")
+        raise ValueError(f"Unsupported file type: {name}")
     df.columns = [c.strip().upper() for c in df.columns]
     return df.copy()  # avoids pandas fragmentation warning
 
@@ -154,13 +157,13 @@ def main() -> int:
         ensure_log_table(conn.cursor())
 
     for src in sources:
-        path = ROOT / src["path"]
-        if not path.exists():
+        if not (ROOT / src["path"]).exists():
             print(f"[missing] {src['path']}")
             continue
-        digest = file_hash(path)
-        df = read_file(path)
-        df = df.assign(_DATASET=src["dataset"], _WAVE=src["wave"], _SOURCE_FILE=path.name,
+        blob, name = open_source(src)
+        digest = hashlib.sha256(blob).hexdigest()
+        df = read_file(blob, name)
+        df = df.assign(_DATASET=src["dataset"], _WAVE=src["wave"], _SOURCE_FILE=name,
                        _FILE_HASH=digest, _LOADED_AT=loaded_at).copy()
         if args.dry_run:
             print(f"[plan] {src['path']} -> {SCHEMA}.{src['table']}: {df.shape[0]} rows x {df.shape[1]} cols, "

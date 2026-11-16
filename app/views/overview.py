@@ -50,6 +50,7 @@ st.markdown(
 st.dataframe(pd.DataFrame([
     ["Kenya", "2011-2012", "Rural villages", "1,440 households, 1,008 in analysis", "$404 or $1,525", "Haushofer & Shapiro"],
     ["Uganda", "2019-2022", "Kiryandongo refugee settlement", "1,264 households, 1,090 in analysis", "$1,000 (= $2,848 PPP)", "IDinsight"],
+    ["Pakistan (comparison)", "2007-2011", "Graduation programme (asset + food stipend + training, not cash)", "1,299 households, 1,007 in analysis", "$2,048 transfer, $5,150 total cost", "Banerjee et al."],
 ], columns=["Country", "Years", "Where", "Households", "Transfer", "Source"]), hide_index=True, width="stretch")
 st.caption("Measure: monthly consumption per person in PPP dollars (food, fuel, health, school and more).")
 
@@ -70,7 +71,9 @@ st.markdown(
     "- **Targeting by type pays off in Uganda:** $11.80 extra per month for every $100, against about $2 when "
     "picking at random.\n"
     "- **But it skips the poorest:** only 19% of the households it picks come from the poorest half.\n"
-    "- **A model from one country doesn't work in the other:** Kenya's model could not find Uganda's top gainers."
+    "- **A model from one country doesn't work in the other:** Kenya's model could not find Uganda's top gainers.
+"
+    "- **Pakistan looks like Kenya:** in the graduation programme the poorer half gained most (+18% after 2 years), but it faded by year 3."
 )
 
 st.subheader("Recommendations")
