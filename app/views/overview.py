@@ -3,7 +3,8 @@ import streamlit as st
 
 import data
 
-st.title("The Programme Manager's View: Who Gains Most from Cash?")
+st.title("Not Just Who Is in Need, but Who Can Rise the Most")
+st.markdown("##### Evidence from Kenya and Uganda on how the same support changes some lives more than others")
 
 st.subheader("Stakeholder Question")
 data.question_box(

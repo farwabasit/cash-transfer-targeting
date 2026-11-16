@@ -4,7 +4,7 @@
 """
 import streamlit as st
 
-st.set_page_config(page_title="Cash Transfer Targeting", page_icon=":material/payments:", layout="wide")
+st.set_page_config(page_title="Who Can Rise the Most", page_icon=":material/payments:", layout="wide")
 
 pages = [
     st.Page("views/overview.py", title="Overview", icon=":material/home:", default=True),
