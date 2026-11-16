@@ -35,3 +35,10 @@ Thumbs.db
 
 # dbt local user id
 transform/.user.yml
+
+# my past presentations (style reference only)
+example ppt style/
+*.pdf
+
+# local editor/tool settings
+.claude/

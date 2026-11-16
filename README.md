@@ -39,6 +39,13 @@ pip install -r requirements.txt
 python ingestion/load_raw.py --dry-run      # check files, no Snowflake needed
 python ingestion/load_raw.py                # load into Snowflake RAW
 ```
+Analysis and app:
+```bash
+pip install -r requirements-analysis.txt
+python analysis/run_analysis.py             # ANCOVA, causal forest, budget simulation -> Snowflake ML schema
+pip install -r requirements-app.txt
+streamlit run app/streamlit_app.py
+```
 With Docker:
 ```bash
 docker build -t ct-ingest .
