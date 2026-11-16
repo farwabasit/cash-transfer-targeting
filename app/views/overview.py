@@ -71,8 +71,7 @@ st.markdown(
     "- **Targeting by type pays off in Uganda:** $11.80 extra per month for every $100, against about $2 when "
     "picking at random.\n"
     "- **But it skips the poorest:** only 19% of the households it picks come from the poorest half.\n"
-    "- **A model from one country doesn't work in the other:** Kenya's model could not find Uganda's top gainers.
-"
+    "- **A model from one country doesn't work in the other:** Kenya's model could not find Uganda's top gainers.\n"
     "- **Pakistan looks like Kenya:** in the graduation programme the poorer half gained most (+18% after 2 years), but it faded by year 3."
 )
 
