@@ -1,3 +1,4 @@
-# Local development: ingestion + dbt
+# local dev + CI: ingestion and dbt (versions = what I tested with)
 -r requirements-ingest.txt
-dbt-snowflake>=1.9
+dbt-snowflake==1.12.5
+dbt-core==1.13.0b1
