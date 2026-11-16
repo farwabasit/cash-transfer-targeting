@@ -1,0 +1,27 @@
+name: cash_transfer
+version: "0.1.0"
+config-version: 2
+profile: cash_transfer
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  cash_transfer:
+    bronze:
+      +schema: BRONZE
+      +materialized: view
+    silver:
+      +schema: SILVER
+      +materialized: table
+    gold:
+      +schema: GOLD
+      +materialized: table
+
+seeds:
+  cash_transfer:
+    +schema: SEEDS

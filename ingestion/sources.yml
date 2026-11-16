@@ -1,0 +1,18 @@
+# Raw survey files to land in Snowflake RAW.
+# A new survey wave = a new entry here. The loader skips files it has already loaded
+# (by SHA-256 hash) and adds any new columns to the target table.
+sources:
+  - dataset: kenya_givedirectly
+    wave: panel_2011_2012
+    path: data/raw/kenya_givedirectly_2011/UCT_FINAL_CLEAN.dta
+    table: KENYA_UCT
+
+  - dataset: uganda_givedirectly
+    wave: baseline_2019
+    path: data/raw/uganda_givedirectly_2019_2022/baseline_anonymized.dta
+    table: UGANDA_BASELINE
+
+  - dataset: uganda_givedirectly
+    wave: endline_2022
+    path: data/raw/uganda_givedirectly_2019_2022/endline_anonymized.dta
+    table: UGANDA_ENDLINE

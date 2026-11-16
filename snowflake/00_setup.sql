@@ -1,0 +1,44 @@
+-- One-off Snowflake setup for the cash transfer project.
+-- Run in a Snowsight worksheet as ACCOUNTADMIN (top-right: role selector).
+-- The RSA_PUBLIC_KEY below was made by: python ingestion/make_keypair.py
+-- (public key only; the private key stays in .secrets/, which git ignores)
+
+USE ROLE ACCOUNTADMIN;
+
+-- 1. Compute: smallest warehouse, pauses after 60 s idle so it costs nothing when unused
+CREATE WAREHOUSE IF NOT EXISTS CT_WH
+  WAREHOUSE_SIZE = XSMALL
+  AUTO_SUSPEND = 60
+  AUTO_RESUME = TRUE
+  INITIALLY_SUSPENDED = TRUE;
+
+-- 2. Cost guard: notify at 80% of 20 credits, suspend the warehouse at 100%
+CREATE RESOURCE MONITOR IF NOT EXISTS CT_MONITOR
+  WITH CREDIT_QUOTA = 20
+  TRIGGERS ON 80 PERCENT DO NOTIFY
+           ON 100 PERCENT DO SUSPEND;
+ALTER WAREHOUSE CT_WH SET RESOURCE_MONITOR = CT_MONITOR;
+
+-- 3. Storage: one database; RAW holds untouched source data, dbt creates the other schemas
+CREATE DATABASE IF NOT EXISTS CASH_TRANSFER;
+CREATE SCHEMA IF NOT EXISTS CASH_TRANSFER.RAW;
+
+-- 4. Least-privilege role for the pipeline (loader + dbt)
+CREATE ROLE IF NOT EXISTS CT_PIPELINE;
+GRANT USAGE ON WAREHOUSE CT_WH TO ROLE CT_PIPELINE;
+GRANT USAGE, CREATE SCHEMA ON DATABASE CASH_TRANSFER TO ROLE CT_PIPELINE;
+GRANT ALL ON SCHEMA CASH_TRANSFER.RAW TO ROLE CT_PIPELINE;
+GRANT ALL ON FUTURE TABLES IN SCHEMA CASH_TRANSFER.RAW TO ROLE CT_PIPELINE;
+GRANT ROLE CT_PIPELINE TO ROLE SYSADMIN;   -- lets you browse the data in Snowsight
+
+-- 5. Service user for code (key-pair login, no password)
+CREATE USER IF NOT EXISTS CT_SERVICE
+  TYPE = SERVICE
+  DEFAULT_ROLE = CT_PIPELINE
+  DEFAULT_WAREHOUSE = CT_WH
+  DEFAULT_NAMESPACE = CASH_TRANSFER.RAW
+  RSA_PUBLIC_KEY = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAt5jLk0wqvx8228DfT1p6fbx7u6DEe2MFEFecNfXK90YGRM6msq70qc8ohqlSw/u5qGy/y10Qi/z3b5/EjlbJVHsosXkTCQkwNSrzszYzyYGBOaTHPzOD47MEL/G93Ilp7viY0I0StGC4AgKcQvkrMqrCrDrlw2aT4D4Isx+h5C1Xioi4MrM/WaVic7mSKDZcM3zQWl47nbkQLVQeCHMUSBhF/Uk2ds5+pGiCUhaJvZJB3A0Tf8vOJXawo1nRBi/fLZsmYgpzGhzPFrG2QK1fX1cY8NFPjpVtSKMcNstuB7p+Iz7UPLK0aK3JRRdlf0Izcw2HuB79XWfsw+neag6RNQIDAQAB';
+GRANT ROLE CT_PIPELINE TO USER CT_SERVICE;
+
+-- Check
+SHOW GRANTS TO ROLE CT_PIPELINE;

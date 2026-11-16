@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Untouched survey files landed by ingestion/load_raw.py
+    database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
+    schema: RAW
+    loaded_at_field: _LOADED_AT
+    freshness:   # survey waves arrive rarely; warn if nothing new in a year
+      warn_after: {count: 365, period: day}
+    tables:
+      - name: KENYA_UCT
+        description: Haushofer & Shapiro GiveDirectly Kenya UCT, baseline (suffix 0) and endline (suffix 1) in one wide file
+        columns:
+          - name: SURVEYID
+            tests: [not_null]
+      - name: UGANDA_BASELINE
+        description: IDinsight GiveDirectly Kiryandongo baseline, Sep-Nov 2019
+        columns:
+          - name: HHID_RAND
+            tests: [not_null, unique]
+      - name: UGANDA_ENDLINE
+        description: IDinsight GiveDirectly Kiryandongo endline, Feb-Apr 2022
+        columns:
+          - name: HHID_RAND
+            tests: [not_null, unique]
+      - name: _LOAD_LOG
+        description: One row per loaded file (hash, rows, new columns) for incremental loads

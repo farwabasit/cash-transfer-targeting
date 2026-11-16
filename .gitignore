@@ -1,0 +1,37 @@
+# Secrets: never commit
+.env
+.secrets/
+*.p8
+*.pem
+
+# Data: raw survey files are downloaded from Harvard Dataverse (see README)
+data/
+
+# Personal working files (log book, emails, notes, course material)
+docs/
+info/
+00_instructions/
+*.docx
+*.mp4
+*.JPG
+*.jpg
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# dbt
+transform/target/
+transform/dbt_packages/
+transform/logs/
+logs/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# dbt local user id
+transform/.user.yml

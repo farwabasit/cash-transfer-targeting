@@ -1,0 +1,3 @@
+# Local development: ingestion + dbt
+-r requirements-ingest.txt
+dbt-snowflake>=1.9
