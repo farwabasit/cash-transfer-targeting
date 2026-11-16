@@ -1,0 +1,36 @@
+version: 2
+
+# what uses the gold layer outside dbt. shows up at the end of the lineage graph
+exposures:
+  - name: streamlit_app
+    label: Who Can Rise the Most (Streamlit app)
+    type: application
+    maturity: medium
+    url: https://cash-transfer-targeting.streamlit.app
+    description: >
+      The app for programme teams. Reads the gold tables and the ML results through a read-only Snowflake user.
+      Pages: overview, who gains most, where the money went, budget trade-off, lump sum or monthly, eight places,
+      check my households, analyse my own programme.
+    depends_on:
+      - ref('gld_household_outcomes')
+      - ref('gld_spending_by_type')
+      - ref('household_types')
+      - ref('transfer_amounts')
+    owner:
+      name: Farwa Basit Hafiza
+
+  - name: python_analysis
+    label: Analysis (ANCOVA, causal forest, budget simulation, meta-analysis)
+    type: ml
+    maturity: medium
+    description: >
+      analysis/run_analysis.py. Reads these tables, estimates effects per household type, runs the causal forest,
+      the budget simulation, the 8-place meta-analysis and lump sum vs monthly. Writes the results to the ML schema.
+    depends_on:
+      - ref('gld_household_outcomes')
+      - ref('gld_graduation_outcomes')
+      - ref('slv_kenya_households')
+      - ref('slv_uganda_households')
+      - ref('graduation_countries')
+    owner:
+      name: Farwa Basit Hafiza

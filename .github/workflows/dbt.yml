@@ -1,24 +1,28 @@
 name: dbt build
 
+# main (and the weekly run) builds the real tables. every other branch and pull request builds into
+# CI_ schemas. That way it can't break what the app reads. then the app is opened page by page.
 on:
   push:
-    branches: [main]
+    branches: ["**"]
   pull_request:
   schedule:
     - cron: "0 6 * * 1"   # mondays 06:00 UTC
   workflow_dispatch:
 
+env:
+  SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+  SNOWFLAKE_USER: CT_SERVICE
+  SNOWFLAKE_ROLE: CT_PIPELINE
+  SNOWFLAKE_WAREHOUSE: CT_WH
+  SNOWFLAKE_DATABASE: CASH_TRANSFER
+  SNOWFLAKE_PRIVATE_KEY_PATH: ${{ github.workspace }}/.secrets/snowflake_key.p8
+  DBT_TARGET: ${{ github.ref == 'refs/heads/main' && 'dev' || 'ci' }}
+
 jobs:
   dbt:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-      SNOWFLAKE_USER: CT_SERVICE
-      SNOWFLAKE_ROLE: CT_PIPELINE
-      SNOWFLAKE_WAREHOUSE: CT_WH
-      SNOWFLAKE_DATABASE: CASH_TRANSFER
-      SNOWFLAKE_PRIVATE_KEY_PATH: ${{ github.workspace }}/.secrets/snowflake_key.p8
     steps:
       - uses: actions/checkout@v4
 
@@ -36,9 +40,33 @@ jobs:
           mkdir -p .secrets
           printf '%s\n' "$KEY" > .secrets/snowflake_key.p8
 
-      - name: dbt build (models + tests)
-        run: python transform/run_dbt.py build
+      - name: dbt build (models + tests) on ${{ env.DBT_TARGET }}
+        run: python transform/run_dbt.py build --target "$DBT_TARGET"
 
       - name: source freshness
-        run: python transform/run_dbt.py source freshness
+        run: python transform/run_dbt.py source freshness --target "$DBT_TARGET"
         continue-on-error: true
+
+  app:
+    needs: dbt
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements-app.txt
+
+      - name: snowflake key from secret
+        env:
+          KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+        run: |
+          mkdir -p .secrets
+          printf '%s\n' "$KEY" > .secrets/snowflake_key.p8
+
+      - name: open every page of the app
+        run: python scripts/test_app.py

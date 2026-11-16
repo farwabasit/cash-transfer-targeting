@@ -1,8 +1,9 @@
 # No secrets here: everything comes from environment variables (.env locally, GitHub secrets in CI).
+# dev = the real tables (main branch, local runs). ci = branch builds, written to CI_ schemas.
 cash_transfer:
   target: dev
   outputs:
-    dev:
+    dev: &snowflake
       type: snowflake
       account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
       user: "{{ env_var('SNOWFLAKE_USER') }}"
@@ -12,3 +13,6 @@ cash_transfer:
       database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
       schema: DEV
       threads: 4
+    ci:
+      <<: *snowflake
+      schema: CI
