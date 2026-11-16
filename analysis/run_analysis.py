@@ -173,28 +173,60 @@ def budget_simulation(df, cate):
     return pd.DataFrame(rows)
 
 
-PAK_HH_SIZE = {"end": 6.29, "fup": 6.58}   # average household size, Banerjee et al. (2015) cost table
-PAK_COST = {"direct_transfer": 2048.15, "total_cost": 5150.14}
+def _ols(y, X):
+    return sm.OLS(y.astype(float), sm.add_constant(X.astype(float))).fit(cov_type="HC1")
 
 
-def pakistan(conn):
-    """graduation programme in pakistan: effect at ~2 years (end) and ~3 years (fup), all and by poverty half"""
-    df = pd.read_sql("select * from GOLD.GLD_PAKISTAN_OUTCOMES", conn)
+def graduation(conn):
+    """6-country graduation programme: effect at ~2 years (end) and ~3 years (fup), all and by poverty half"""
+    df = pd.read_sql("select o.*, c.total_cost_ppp, c.direct_transfer_ppp, c.hh_size_end, c.hh_size_fup "
+                     "from GOLD.GLD_GRADUATION_OUTCOMES o join SEEDS.GRADUATION_COUNTRIES c using (country)", conn)
     df.columns = [c.lower() for c in df.columns]
     rows = []
-    for wave in ["end", "fup"]:
-        d = df[df[f"consumption_pc_{wave}_w"].notna()]
-        for group, g in [("ALL", d)] + sorted(d.groupby("poverty_group")):
-            X = sm.add_constant(g[["treated", "consumption_pc_bl_w"]].astype(float))
-            m = sm.OLS(g[f"consumption_pc_{wave}_w"].astype(float), X).fit(cov_type="HC1")
-            b, se = m.params["treated"], m.bse["treated"]
-            ctrl = g.loc[g.treated == 0, f"consumption_pc_{wave}_w"].mean()
-            rows.append(dict(
-                wave={"end": "about 2 years", "fup": "about 3 years"}[wave], group=group, n=len(g),
-                n_treatment=int(g.treated.sum()), effect_pc=b, se=se, ci_low=b - 1.96 * se, ci_high=b + 1.96 * se,
-                p_value=m.pvalues["treated"], control_mean=ctrl, effect_pct=b / ctrl,
-                gain_per_100_transfer=100 * b * PAK_HH_SIZE[wave] / PAK_COST["direct_transfer"],
-                gain_per_100_total_cost=100 * b * PAK_HH_SIZE[wave] / PAK_COST["total_cost"]))
+    for (country, name), cg in df.groupby(["country", "country_name"]):
+        for wave in ["end", "fup"]:
+            d = cg[cg[f"consumption_pc_{wave}_w"].notna()]
+            size = d[f"hh_size_{wave}"].iloc[0]
+            for group, g in [("ALL", d)] + sorted(d.groupby("poverty_group")):
+                m = _ols(g[f"consumption_pc_{wave}_w"], g[["treated", "consumption_pc_bl_w"]])
+                b, se = m.params["treated"], m.bse["treated"]
+                ctrl = g.loc[g.treated == 0, f"consumption_pc_{wave}_w"].mean()
+                rows.append(dict(
+                    country=country, country_name=name,
+                    wave={"end": "about 2 years", "fup": "about 3 years"}[wave], group=group, n=len(g),
+                    n_treatment=int(g.treated.sum()), effect_pc=b, se=se, ci_low=b - 1.96 * se, ci_high=b + 1.96 * se,
+                    p_value=m.pvalues["treated"], control_mean=ctrl, effect_pct=b / ctrl,
+                    gain_per_100_transfer=100 * b * size / d.direct_transfer_ppp.iloc[0],
+                    gain_per_100_total_cost=100 * b * size / d.total_cost_ppp.iloc[0]))
+    return pd.DataFrame(rows), df
+
+
+def poorer_vs_less_poor(cash, grad):
+    """the headline comparison across all 8 places: does the poorer half gain more than the less poor half?
+    one regression per place with an interaction: after ~ treated + poorer + treated x poorer + before"""
+    places = []
+    for c, g in cash.groupby("country"):
+        g = g.assign(poorer=(g.household_type.isin(["A", "B"])).astype(int),
+                     after=g.consumption_pc_el_w, before=g.consumption_pc_bl_w)
+        places.append(({"KEN": "Kenya", "UGA": "Uganda"}[c], "Cash transfer", g))
+    for name, g in grad.groupby("country_name"):
+        g = g[g.consumption_pc_end_w.notna()]
+        g = g.assign(poorer=(g.poverty_group == "poorer").astype(int),
+                     after=g.consumption_pc_end_w, before=g.consumption_pc_bl_w)
+        places.append((name, "Graduation", g))
+    rows = []
+    for place, programme, g in places:
+        g = g.assign(treated_x_poorer=g.treated * g.poorer)
+        m = _ols(g.after, g[["treated", "poorer", "treated_x_poorer", "before"]])
+        b, d, se_d = m.params["treated"], m.params["treated_x_poorer"], m.bse["treated_x_poorer"]
+        ctrl_p = g.loc[(g.treated == 0) & (g.poorer == 1), "after"].mean()
+        ctrl_l = g.loc[(g.treated == 0) & (g.poorer == 0), "after"].mean()
+        rows.append(dict(place=place, programme=programme, n=len(g),
+                         gain_pct_poorer=(b + d) / ctrl_p, gain_pct_less_poor=b / ctrl_l,
+                         difference_pc=d, difference_ci_low=d - 1.96 * se_d, difference_ci_high=d + 1.96 * se_d,
+                         difference_p_value=m.pvalues["treated_x_poorer"],
+                         who_gains_more=("poorer half" if d > 0 else "less poor half")
+                         + ("" if m.pvalues["treated_x_poorer"] < 0.05 else " (not clear)")))
     return pd.DataFrame(rows)
 
 
@@ -224,8 +256,10 @@ def main():
         "TYPE_CHECK": type_check(cate),
         "TRANSFER_CHECK": transfer_check(df),
         "BUDGET_SIMULATION": budget_simulation(df, cate),
-        "PAKISTAN_EFFECTS": pakistan(conn),
     }
+    grad_effects, grad = graduation(conn)
+    tables["GRADUATION_EFFECTS"] = grad_effects
+    tables["POORER_VS_LESS_POOR"] = poorer_vs_less_poor(df, grad)
     pd.set_option("display.width", 220)
     for k, v in tables.items():
         if k != "HOUSEHOLD_CATE":

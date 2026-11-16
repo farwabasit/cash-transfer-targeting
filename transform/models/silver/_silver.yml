@@ -142,12 +142,16 @@ models:
         tests:
           - in_range: {min_value: 0, max_value: 1}
 
-  # pakistan
-  - name: slv_pakistan_households
-    description: Pakistan households from the graduation programme data (not cash). Consumption in 2014 USD PPP.
+  # graduation programme (6 countries)
+  - name: slv_graduation_households
+    description: Households from the 6-country graduation programme (not cash). Consumption in 2014 USD PPP.
+    tests:
+      - unique_combination: {columns: [country, household_id]}
     columns:
-      - name: household_id
-        tests: [unique, not_null]
+      - name: country
+        tests:
+          - not_null
+          - accepted_values: {values: [ETH, GHA, HND, IND, PAK, PER]}
       - name: treated
         tests:
           - accepted_values: {values: [0, 1], quote: false}

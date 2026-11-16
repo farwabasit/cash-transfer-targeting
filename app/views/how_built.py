@@ -18,8 +18,8 @@ st.code(
 
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("dbt models", "15")
-c2.metric("Data tests", "59")
-c3.metric("Seeds", "6")
+c2.metric("Data tests", "61")
+c3.metric("Seeds", "7")
 c4.metric("Contracts", "3")
 
 st.subheader("What Each Layer Does")
@@ -36,7 +36,7 @@ st.dataframe(pd.DataFrame([
 
 st.subheader("Layered Data Quality Testing")
 st.markdown(
-    "- **59 tests** across all layers: not_null, unique, accepted_values, relationships\n"
+    "- **61 tests** across all layers: not_null, unique, accepted_values, relationships\n"
     "- **Custom tests**: `in_range` (no negative spending, food share between 0 and 1) and "
     "`unique_combination` (checks the grain of every model)\n"
     "- **Data contracts** on the main household tables: column names and types are fixed\n"

@@ -50,7 +50,7 @@ st.markdown(
 st.dataframe(pd.DataFrame([
     ["Kenya", "2011-2012", "Rural villages", "1,440 households, 1,008 in analysis", "$404 or $1,525", "Haushofer & Shapiro"],
     ["Uganda", "2019-2022", "Kiryandongo refugee settlement", "1,264 households, 1,090 in analysis", "$1,000 (= $2,848 PPP)", "IDinsight"],
-    ["Pakistan (comparison)", "2007-2011", "Graduation programme (asset + food stipend + training, not cash)", "1,299 households, 1,007 in analysis", "$2,048 transfer, $5,150 total cost", "Banerjee et al."],
+    ["6 countries (comparison)", "2007-2014", "Graduation programme in Ethiopia, Ghana, Honduras, India, Pakistan, Peru (asset + food stipend + training, not cash)", "10,508 households, 9,424 in analysis", "$1,257 to $5,150 total cost", "Banerjee et al."],
 ], columns=["Country", "Years", "Where", "Households", "Transfer", "Source"]), hide_index=True, width="stretch")
 st.caption("Measure: monthly consumption per person in PPP dollars (food, fuel, health, school and more).")
 
@@ -66,20 +66,22 @@ st.dataframe(pd.DataFrame([
 st.subheader("Insights")
 st.markdown(
     "- **Cash works in both places:** consumption per person +17% in Kenya and +13% in Uganda.\n"
-    "- **Who gains most is opposite in the two countries:** in Kenya the poorer, larger households gain most "
-    "(+27%), in Uganda the less poor households do (+21% and +27%).\n"
+    "- **In Uganda the less poor gained most:** +21% and +27% for the less poor types. In Kenya the poorer, larger "
+    "households gained +27%, but the difference with the less poor is not clear.\n"
     "- **Targeting by type pays off in Uganda:** $11.80 extra per month for every $100, against about $2 when "
     "picking at random.\n"
     "- **But it skips the poorest:** only 19% of the households it picks come from the poorest half.\n"
     "- **A model from one country doesn't work in the other:** Kenya's model could not find Uganda's top gainers.\n"
-    "- **Pakistan looks like Kenya:** in the graduation programme the poorer half gained most (+18% after 2 years), but it faded by year 3."
+    "- **No general rule across 8 places:** in the two cash trials and six graduation countries, only Uganda showed a "
+    "clear difference between the poorer and the less poor half."
 )
 
 st.subheader("Recommendations")
 st.markdown(
     "- **Use your own local data:** who benefits depends on the context. Run the pipeline on your own baseline survey.\n"
     "- **Decide the trade-off openly:** more impact per dollar or reaching the poorest first. Show both numbers to the board.\n"
-    "- **Use simple types, not single scores:** type rules are easy to explain and a machine learning model agreed with them."
+    "- **Use simple types, not single scores:** type rules are easy to explain and a machine learning model agreed with them.\n"
+    "- **Don't copy a targeting rule from elsewhere:** test it on your own households first."
 )
 
 with st.expander("Limitations"):
