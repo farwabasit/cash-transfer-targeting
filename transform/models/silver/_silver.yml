@@ -5,29 +5,29 @@ models:
   - name: slv_uganda_consumption_items
     description: One row per household x wave x consumption item, with the monthly value in UGX.
     tests:
-      - unique_combination: {columns: [household_id, wave, item]}
+      - unique_combination: {arguments: {columns: [household_id, wave, item]}}
     columns:
       - name: household_id
         tests: [not_null]
       - name: wave
         tests:
-          - accepted_values: {values: [baseline_2019, endline_2022]}
+          - accepted_values: {arguments: {values: [baseline_2019, endline_2022]}}
       - name: monthly_value_lcu
         tests:
-          - in_range: {min_value: 0}
+          - in_range: {arguments: {min_value: 0}}
 
   - name: slv_uganda_household_consumption
     description: Monthly consumption per person in UGX and PPP $, top 1% winsorised per wave.
     config:
       contract: {enforced: true}
     tests:
-      - unique_combination: {columns: [household_id, wave]}
+      - unique_combination: {arguments: {columns: [household_id, wave]}}
     columns:
       - name: household_id
         data_type: varchar
         constraints: [{type: not_null}]
         tests:
-          - relationships: {to: ref('slv_uganda_households'), field: household_id}
+          - relationships: {arguments: {to: ref('slv_uganda_households'), field: household_id}}
       - name: country
         data_type: varchar
       - name: wave
@@ -38,7 +38,7 @@ models:
       - name: hh_size
         data_type: float
         tests:
-          - in_range: {min_value: 1, max_value: 40}
+          - in_range: {arguments: {min_value: 1, max_value: 40}}
       - name: food_monthly_lcu
         data_type: float
         tests: [not_null]
@@ -48,7 +48,7 @@ models:
       - name: total_monthly_lcu
         data_type: float
         tests:
-          - in_range: {min_value: 0}
+          - in_range: {arguments: {min_value: 0}}
       - name: total_monthly_lcu_w
         data_type: float
       - name: consumption_pc_lcu
@@ -58,13 +58,12 @@ models:
         description: Main outcome. Warns (not fails) on a few 1-person households above 2000, fix in gold.
         tests:
           - in_range:
-              min_value: 0
-              max_value: 2000
+              arguments: {min_value: 0, max_value: 2000}
               config: {severity: warn}
       - name: food_share
         data_type: float
         tests:
-          - in_range: {min_value: 0, max_value: 1}
+          - in_range: {arguments: {min_value: 0, max_value: 1}}
 
   - name: slv_uganda_households
     description: One row per Uganda household with random assignment and baseline characteristics.
@@ -73,10 +72,10 @@ models:
         tests: [unique, not_null]
       - name: treated
         tests:
-          - accepted_values: {values: [0, 1], quote: false}
+          - accepted_values: {arguments: {values: [0, 1], quote: false}}
       - name: cohort
         tests:
-          - accepted_values: {values: [1, 2, 17, 18, 19, 20], quote: false}
+          - accepted_values: {arguments: {values: [1, 2, 17, 18, 19, 20], quote: false}}
 
   # kenya
   - name: slv_kenya_households
@@ -98,7 +97,7 @@ models:
         data_type: varchar
         tests:
           - not_null
-          - accepted_values: {values: [treatment, spillover, pure_control]}
+          - accepted_values: {arguments: {values: [treatment, spillover, pure_control]}}
       - name: treated
         data_type: number
       - name: lump_sum
@@ -110,7 +109,7 @@ models:
       - name: hh_size_bl
         data_type: number
         tests:
-          - in_range: {min_value: 1, max_value: 30}
+          - in_range: {arguments: {min_value: 1, max_value: 30}}
       - name: children_bl
         data_type: number
       - name: has_children_bl
@@ -129,32 +128,32 @@ models:
   - name: slv_kenya_household_consumption
     description: One row per Kenya household x wave with monthly consumption in PPP dollars (as published).
     tests:
-      - unique_combination: {columns: [household_id, wave]}
+      - unique_combination: {arguments: {columns: [household_id, wave]}}
     columns:
       - name: household_id
         tests:
           - not_null
-          - relationships: {to: ref('slv_kenya_households'), field: household_id}
+          - relationships: {arguments: {to: ref('slv_kenya_households'), field: household_id}}
       - name: consumption_pc_ppp
         tests:
-          - in_range: {min_value: 0, max_value: 2000}
+          - in_range: {arguments: {min_value: 0, max_value: 2000}}
       - name: food_share
         tests:
-          - in_range: {min_value: 0, max_value: 1}
+          - in_range: {arguments: {min_value: 0, max_value: 1}}
 
   # graduation programme (6 countries)
   - name: slv_graduation_households
     description: Households from the 6-country graduation programme (not cash). Consumption in 2014 USD PPP.
     tests:
-      - unique_combination: {columns: [country, household_id]}
+      - unique_combination: {arguments: {columns: [country, household_id]}}
     columns:
       - name: country
         tests:
           - not_null
-          - accepted_values: {values: [ETH, GHA, HND, IND, PAK, PER]}
+          - accepted_values: {arguments: {values: [ETH, GHA, HND, IND, PAK, PER]}}
       - name: treated
         tests:
-          - accepted_values: {values: [0, 1], quote: false}
+          - accepted_values: {arguments: {values: [0, 1], quote: false}}
       - name: consumption_pc_bl
         tests:
-          - in_range: {min_value: 0}
+          - in_range: {arguments: {min_value: 0}}

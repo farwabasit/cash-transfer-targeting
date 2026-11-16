@@ -9,7 +9,7 @@ models:
     config:
       contract: {enforced: true}
     tests:
-      - unique_combination: {columns: [country, household_id]}
+      - unique_combination: {arguments: {columns: [country, household_id]}}
     columns:
       - name: household_id
         data_type: varchar
@@ -17,7 +17,7 @@ models:
       - name: country
         data_type: varchar
         tests:
-          - accepted_values: {values: [KEN, UGA]}
+          - accepted_values: {arguments: {values: [KEN, UGA]}}
       - name: arm
         data_type: varchar
       - name: treated
@@ -27,7 +27,7 @@ models:
       - name: household_type
         data_type: varchar
         tests:
-          - accepted_values: {values: [A, B, C, D]}
+          - accepted_values: {arguments: {values: [A, B, C, D]}}
       - name: household_type_label
         data_type: varchar
       - name: hh_size_bl
@@ -52,37 +52,37 @@ models:
   - name: gld_effects_by_type
     description: Effect of cash per country and household type, ROI and poverty metrics.
     tests:
-      - unique_combination: {columns: [country, household_type]}
+      - unique_combination: {arguments: {columns: [country, household_type]}}
     columns:
       - name: n_control
         tests:
-          - in_range: {min_value: 30}   # too few households makes the comparison meaningless
+          - in_range: {arguments: {min_value: 30}}   # too few households makes the comparison meaningless
       - name: n_treatment
         tests:
-          - in_range: {min_value: 30}
+          - in_range: {arguments: {min_value: 30}}
       - name: share_poor_control
         tests:
-          - in_range: {min_value: 0, max_value: 1}
+          - in_range: {arguments: {min_value: 0, max_value: 1}}
 
   - name: gld_household_spending
     description: Endline spending per person per month by spending group (PPP $), one row per household and group.
     tests:
-      - unique_combination: {columns: [country, household_id, spend_group]}
+      - unique_combination: {arguments: {columns: [country, household_id, spend_group]}}
     columns:
       - name: spend_pc_ppp
         tests:
-          - in_range: {min_value: 0}
+          - in_range: {arguments: {min_value: 0}}
 
   - name: gld_spending_by_type
     description: Where the money went. Average spending per person with and without cash, by country, type and group.
     tests:
-      - unique_combination: {columns: [country, household_type, spend_group]}
+      - unique_combination: {arguments: {columns: [country, household_type, spend_group]}}
 
   - name: gld_graduation_outcomes
     description: Graduation households in 6 countries with poverty group (poorer / less poor half within country) and capped consumption.
     tests:
-      - unique_combination: {columns: [country, household_id]}
+      - unique_combination: {arguments: {columns: [country, household_id]}}
     columns:
       - name: poverty_group
         tests:
-          - accepted_values: {values: [poorer, less_poor]}
+          - accepted_values: {arguments: {values: [poorer, less_poor]}}

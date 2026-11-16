@@ -35,10 +35,10 @@ seeds:
       - name: recall
         tests:
           - not_null
-          - relationships: {to: ref('recall_periods'), field: recall}
+          - relationships: {arguments: {to: ref('recall_periods'), field: recall}}
       - name: category
         tests:
-          - accepted_values: {values: [food_home, food_away, nonfood]}
+          - accepted_values: {arguments: {values: [food_home, food_away, nonfood]}}
 
   - name: graduation_countries
     description: Country codes, programme cost per household and average household size from the graduation paper's cost table.
