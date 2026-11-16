@@ -123,7 +123,7 @@ labels = (bb.transform_filter("datum.share_poorest_half <= 0.75").mark_text(alig
 st.altair_chart((alt.Chart().mark_rule(color=data.CONTROL_GREY, strokeDash=[4, 4]).encode(y=alt.datum(0))
                  + bb.mark_circle(size=160, color=color, opacity=1) + labels).properties(height=340), width="stretch")
 st.caption("Budget for 30% of the households in the file. The type rule is learned on one half of the data and "
-           "tested on the other half, so it isn't judged on the data it learned from.")
+           "tested on the other half. That way it is not judged on the data it learned from.")
 
 out = d.merge(eff[["type", "effect", "label"]].rename(columns={"effect": "type_gain_pc"}), on="type", how="left")
 out["type_gain_pc"] = out.type_gain_pc * rate
