@@ -1,0 +1,5 @@
+# analysis step (analysis/run_analysis.py), kept separate so CI stays fast
+-r requirements.txt
+statsmodels==0.15.0
+econml==0.17.0
+scikit-learn==1.9.1
