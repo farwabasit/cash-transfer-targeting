@@ -1,0 +1,4 @@
+recall,description,monthly_factor
+7d,last 7 days (x 30.4/7),4.342857142857
+4w,last 4 weeks (x 30.4/28),1.085714285714
+12m,last 12 months (/ 12),0.083333333333

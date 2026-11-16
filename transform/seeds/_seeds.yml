@@ -1,0 +1,41 @@
+version: 2
+
+seeds:
+  - name: recall_periods
+    description: Converts a survey recall period to a monthly amount (30.4 days per month).
+    config:
+      column_types:
+        monthly_factor: float
+    columns:
+      - name: recall
+        tests: [unique, not_null]
+      - name: monthly_factor
+        tests: [not_null]
+
+  - name: ppp_factors
+    description: Local currency per international dollar, used to convert consumption to PPP dollars.
+    columns:
+      - name: country
+        tests: [not_null]
+      - name: year
+        tests: [not_null]
+
+  - name: uganda_consumption_items
+    description: >
+      Uganda consumption items: raw column, recall period, category and spending group.
+      in_aggregate = false means not in the total (e.g. home alcohol) but still used for
+      the spending breakdown. Add rows here when a new wave has new items.
+    config:
+      column_types:
+        quantity_column: varchar
+        price_column: varchar
+    columns:
+      - name: item
+        tests: [unique, not_null]
+      - name: recall
+        tests:
+          - not_null
+          - relationships: {to: ref('recall_periods'), field: recall}
+      - name: category
+        tests:
+          - accepted_values: {values: [food_home, food_away, nonfood]}
