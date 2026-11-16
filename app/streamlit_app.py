@@ -15,6 +15,7 @@ pages = [
     st.Page("views/check.py", title="Check my households", icon=":material/upload_file:"),
     st.Page("views/own_programme.py", title="Analyse my own programme", icon=":material/insights:"),
     st.Page("views/how_built.py", title="How it's built", icon=":material/account_tree:"),
+    st.Page("views/dbt_docs.py", title="Data catalogue (dbt docs)", icon=":material/menu_book:"),
 ]
 st.navigation(pages).run()
 
