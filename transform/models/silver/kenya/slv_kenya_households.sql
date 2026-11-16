@@ -26,5 +26,8 @@ select
     "B_MARRIED" = 1                              as married_bl,
     "B_EDU"::float                               as respondent_education_years_bl,
     "HH_TOTALMEMBERS1"::int                      as hh_size_el,
-    ("CONS_NONDURABLE_PPP_MISS0" = 1 or "PURECONTROL" = 1) as consumption_missing_bl  -- see kenya consumption model
+    ("CONS_NONDURABLE_PPP_MISS0" = 1 or "PURECONTROL" = 1) as consumption_missing_bl,  -- see kenya consumption model
+    -- total asset value (livestock, furniture, roof etc.) in PPP $. pure control has no baseline here either
+    iff("PURECONTROL" = 1, null, "ASSET_TOTAL_PPP0"::float) as asset_value_bl,
+    "ASSET_TOTAL_PPP1"::float                    as asset_value_el
 from src
