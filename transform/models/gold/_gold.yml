@@ -1,0 +1,77 @@
+version: 2
+
+models:
+  - name: gld_household_outcomes
+    description: >
+      One row per household (Kenya + Uganda) with household type A-D, consumption per person at
+      baseline and endline (capped at p99 per country) and transfer size. Types use the country's
+      own medians, so they are relative within each country.
+    config:
+      contract: {enforced: true}
+    tests:
+      - unique_combination: {columns: [country, household_id]}
+    columns:
+      - name: household_id
+        data_type: varchar
+        constraints: [{type: not_null}]
+      - name: country
+        data_type: varchar
+        tests:
+          - accepted_values: {values: [KEN, UGA]}
+      - name: arm
+        data_type: varchar
+      - name: treated
+        data_type: number
+      - name: in_analysis
+        data_type: boolean
+      - name: household_type
+        data_type: varchar
+        tests:
+          - accepted_values: {values: [A, B, C, D]}
+      - name: household_type_label
+        data_type: varchar
+      - name: hh_size_bl
+        data_type: float
+      - name: consumption_pc_bl
+        data_type: float
+      - name: consumption_pc_el
+        data_type: float
+      - name: consumption_pc_bl_w
+        data_type: float
+      - name: consumption_pc_el_w
+        data_type: float
+      - name: median_consumption_pc_bl
+        data_type: float
+      - name: median_hh_size_bl
+        data_type: float
+      - name: transfer_size
+        data_type: varchar
+      - name: transfer_ppp
+        data_type: float
+
+  - name: gld_effects_by_type
+    description: Effect of cash per country and household type, ROI and poverty metrics.
+    tests:
+      - unique_combination: {columns: [country, household_type]}
+    columns:
+      - name: n_control
+        tests:
+          - in_range: {min_value: 30}   # too few households makes the comparison meaningless
+      - name: n_treatment
+        tests:
+          - in_range: {min_value: 30}
+      - name: share_poor_control
+        tests:
+          - in_range: {min_value: 0, max_value: 1}
+
+  - name: gld_household_spending
+    tests:
+      - unique_combination: {columns: [country, household_id, spend_group]}
+    columns:
+      - name: spend_pc_ppp
+        tests:
+          - in_range: {min_value: 0}
+
+  - name: gld_spending_by_type
+    tests:
+      - unique_combination: {columns: [country, household_type, spend_group]}

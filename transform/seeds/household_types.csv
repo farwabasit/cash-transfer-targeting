@@ -1,0 +1,5 @@
+household_type,poverty_group,size_group,label,rule
+A,poorer,small,"Poorer, smaller household","Baseline consumption per person below the country median and household size below the country median"
+B,poorer,large,"Poorer, larger household","Baseline consumption per person below the country median and household size at or above the country median"
+C,less_poor,small,"Less poor, smaller household","Baseline consumption per person at or above the country median and household size below the country median"
+D,less_poor,large,"Less poor, larger household","Baseline consumption per person at or above the country median and household size at or above the country median"
