@@ -24,7 +24,7 @@ waves as (
         {{ year }}                                   as survey_year,
         {%- if suffix == '0' %}
         "B_HHSIZE"::float                            as hh_size,
-        -- pure control had no baseline survey but the file has 0 there, so treat as missing
+        -- pure control had no baseline survey but the file has 0 there. treat as missing
         ("CONS_NONDURABLE_PPP_MISS0" = 1 or "PURECONTROL" = 1) as is_missing,
         {%- else %}
         coalesce("HH_TOTALMEMBERS1", "B_HHSIZE")::float as hh_size,

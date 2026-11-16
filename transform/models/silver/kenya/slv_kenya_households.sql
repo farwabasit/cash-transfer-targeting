@@ -1,6 +1,6 @@
 -- 1 row per household
 -- raw file has 2 rows per hh (female + male respondent). checked: only the psych scores
--- differ between them, so keeping the female row is fine for household variables
+-- differ between them. keeping the female row is fine for household variables
 with src as (
     select *
     from {{ ref('brz_kenya_uct') }}

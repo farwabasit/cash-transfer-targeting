@@ -85,7 +85,7 @@ def forest():
     from econml.dml import CausalForestDML
     return CausalForestDML(
         model_y=RandomForestRegressor(n_estimators=200, min_samples_leaf=10, random_state=SEED),
-        model_t=DummyClassifier(strategy="prior"),   # randomised, so treatment can't be predicted
+        model_t=DummyClassifier(strategy="prior"),   # randomised: treatment can't be predicted
         discrete_treatment=True, n_estimators=400, min_samples_leaf=20,
         max_depth=6, random_state=SEED)
 

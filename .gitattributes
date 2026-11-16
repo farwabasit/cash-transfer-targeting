@@ -1,3 +1,6 @@
 * text=auto eol=lf
 *.dta binary
 *.p8 binary
+
+# GitHub hides SQL from the language bar by default (it counts as "data"). show the dbt models
+*.sql linguist-detectable=true linguist-language=SQL

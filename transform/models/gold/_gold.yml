@@ -5,7 +5,7 @@ models:
     description: >
       One row per household (Kenya + Uganda) with household type A-D, consumption per person at
       baseline and endline (capped at p99 per country) and transfer size. Types use the country's
-      own medians, so they are relative within each country.
+      own medians. They are relative within each country.
     config:
       contract: {enforced: true}
     tests:

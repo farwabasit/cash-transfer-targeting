@@ -1,5 +1,5 @@
 {# one row per household / wave / item. item list is in seeds/uganda_consumption_items.csv
-   baseline and endline questionnaires don't have the same items, so each column is
+   baseline and endline questionnaires don't have the same items. each column is
    checked against the wave first and skipped if it's not there #}
 {%- set waves = [
     {'wave': 'baseline_2019', 'year': 2019, 'rel': ref('brz_uganda_baseline')},

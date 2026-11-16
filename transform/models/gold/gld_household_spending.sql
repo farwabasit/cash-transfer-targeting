@@ -31,7 +31,7 @@ ken as (
     unpivot (spend for spend_group in (
         food_monthly_ppp, health_monthly_ppp, education_monthly_ppp, social_monthly_ppp))
     union all
-    -- uganda has alcohol and tobacco together, so combine them for kenya too
+    -- uganda has alcohol and tobacco together. combine them for kenya too
     select household_id, 'KEN', 'alcohol_tobacco_monthly_ppp',
            (coalesce(alcohol_monthly_ppp, 0) + coalesce(tobacco_monthly_ppp, 0)) / hh_size
     from ken_el
