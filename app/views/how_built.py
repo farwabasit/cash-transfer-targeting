@@ -17,14 +17,14 @@ st.code(
     language=None)
 
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("dbt models", "12")
-c2.metric("Data tests", "50")
+c1.metric("dbt models", "15")
+c2.metric("Data tests", "59")
 c3.metric("Seeds", "6")
 c4.metric("Contracts", "3")
 
 st.subheader("What Each Layer Does")
 st.dataframe(pd.DataFrame([
-    ["Raw", "3 survey files land as they are, plus lineage columns (file, hash, wave, loaded at). A load log "
+    ["Raw", "4 survey files land as they are (one read straight from a zip), plus lineage columns (file, hash, wave, loaded at). A load log "
             "makes reruns safe: a file is never loaded twice."],
     ["Bronze", "Views on the raw tables. Source tests: IDs not null, Uganda IDs unique per wave."],
     ["Silver", "Kenya: 2,880 rows -> 1,440 households. Uganda: ~100 survey items with 7-day, 4-week and 12-month "
@@ -36,7 +36,7 @@ st.dataframe(pd.DataFrame([
 
 st.subheader("Layered Data Quality Testing")
 st.markdown(
-    "- **50 tests** across all layers: not_null, unique, accepted_values, relationships\n"
+    "- **59 tests** across all layers: not_null, unique, accepted_values, relationships\n"
     "- **Custom tests**: `in_range` (no negative spending, food share between 0 and 1) and "
     "`unique_combination` (checks the grain of every model)\n"
     "- **Data contracts** on the main household tables: column names and types are fixed\n"
