@@ -40,5 +40,3 @@ transform/.user.yml
 example ppt style/
 *.pdf
 
-# local editor/tool settings
-.claude/
