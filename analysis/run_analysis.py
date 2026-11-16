@@ -230,6 +230,62 @@ def poorer_vs_less_poor(cash, grad):
     return pd.DataFrame(rows)
 
 
+def _places(cash, grad):
+    """all 8 places in one shape: after, before, treated, poorer"""
+    out = []
+    for c, g in cash.groupby("country"):
+        out.append(({"KEN": "Kenya", "UGA": "Uganda"}[c], "Cash transfer",
+                    pd.DataFrame({"after": g.consumption_pc_el_w, "before": g.consumption_pc_bl_w, "treated": g.treated,
+                                  "poorer": g.household_type.isin(["A", "B"]).astype(int)})))
+    for name, g in grad.groupby("country_name"):
+        g = g[g.consumption_pc_end_w.notna()]
+        out.append((name, "Graduation", pd.DataFrame({"after": g.consumption_pc_end_w, "before": g.consumption_pc_bl_w,
+                                                      "treated": g.treated, "poorer": (g.poverty_group == "poorer").astype(int)})))
+    return out
+
+
+def _meta(est, se):
+    """inverse-variance meta-analysis: fixed effect + DerSimonian-Laird random effects + I2"""
+    est, se = np.asarray(est, float), np.asarray(se, float)
+    w = 1 / se**2
+    fe = (w * est).sum() / w.sum()
+    fe_se = np.sqrt(1 / w.sum())
+    q = (w * (est - fe) ** 2).sum()
+    k = len(est)
+    tau2 = max(0.0, (q - (k - 1)) / (w.sum() - (w**2).sum() / w.sum()))
+    wr = 1 / (se**2 + tau2)
+    re = (wr * est).sum() / wr.sum()
+    re_se = np.sqrt(1 / wr.sum())
+    i2 = max(0.0, (q - (k - 1)) / q) if q > 0 else 0.0
+    from scipy import stats
+    return dict(fixed=fe, fixed_se=fe_se, random=re, random_se=re_se,
+                random_p=2 * (1 - stats.norm.cdf(abs(re / re_se))), i2=i2, tau=np.sqrt(tau2), k=k)
+
+
+def pooled(cash, grad):
+    """put every place on the same scale (share of its own control group's consumption) then combine.
+    per place: overall gain, and the gap 'poorer half minus less poor half' from one regression"""
+    rows = []
+    for place, programme, g in _places(cash, grad):
+        scale = g.loc[g.treated == 0, "after"].mean()
+        g = g.assign(after=g.after / scale, before=g.before / scale)
+        m_all = _ols(g.after, g[["treated", "before"]])
+        g = g.assign(treated_x_poorer=g.treated * g.poorer)
+        m_int = _ols(g.after, g[["treated", "poorer", "treated_x_poorer", "before"]])
+        rows.append(dict(place=place, programme=programme, n=len(g),
+                         gain=m_all.params["treated"], gain_se=m_all.bse["treated"],
+                         gap=m_int.params["treated_x_poorer"], gap_se=m_int.bse["treated_x_poorer"]))
+    by_place = pd.DataFrame(rows)
+    meta = []
+    for subset, d in [("All 8 places", by_place), ("Cash (2)", by_place[by_place.programme == "Cash transfer"]),
+                      ("Graduation (6)", by_place[by_place.programme == "Graduation"])]:
+        for what, col in [("Overall gain", "gain"), ("Poorer minus less poor", "gap")]:
+            r = _meta(d[col], d[col + "_se"])
+            meta.append(dict(subset=subset, measure=what, households=int(d.n.sum()), **r,
+                             ci_low=r["random"] - 1.96 * r["random_se"], ci_high=r["random"] + 1.96 * r["random_se"]))
+    return by_place, pd.DataFrame(meta)
+
+
 def write(conn, tables):
     from snowflake.connector.pandas_tools import write_pandas
     conn.cursor().execute("create schema if not exists ML")
@@ -260,6 +316,7 @@ def main():
     grad_effects, grad = graduation(conn)
     tables["GRADUATION_EFFECTS"] = grad_effects
     tables["POORER_VS_LESS_POOR"] = poorer_vs_less_poor(df, grad)
+    tables["POOLED_BY_PLACE"], tables["POOLED_META"] = pooled(df, grad)
     pd.set_option("display.width", 220)
     for k, v in tables.items():
         if k != "HOUSEHOLD_CATE":

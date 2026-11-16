@@ -72,8 +72,8 @@ st.markdown(
     "picking at random.\n"
     "- **But it skips the poorest:** only 19% of the households it picks come from the poorest half.\n"
     "- **A model from one country doesn't work in the other:** Kenya's model could not find Uganda's top gainers.\n"
-    "- **No general rule across 8 places:** in the two cash trials and six graduation countries, only Uganda showed a "
-    "clear difference between the poorer and the less poor half."
+    "- **Across 8 places the poorest gain as much as the less poor:** combining 11,522 households in two cash trials "
+    "and six graduation countries, the gap is about 1 point. Only Uganda differed clearly."
 )
 
 st.subheader("Recommendations")

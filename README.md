@@ -11,7 +11,7 @@ NGOs and funders that give cash have a fixed budget and more poor households tha
 
 ## What I found
 - Cash raised consumption per person by about 17% in Kenya and 13% in Uganda.
-- In Uganda the less poor households gained most. Across 8 places (2 cash trials + 6 graduation countries) that was the only clear difference between the poorer and the less poor half. There is no general rule.
+- Across 8 places (2 cash trials + 6 graduation countries, 11,522 households) the poorer half gained as much as the less poor half: the combined gap is about 1 point (95% range -6.5 to +4.2). Only Uganda differed clearly, with the less poor gaining more.
 - Targeting by type in Uganda gave about 5x more per dollar than random, but reached far fewer of the poorest.
 - A model trained on Kenya could not find Uganda's top gainers. Programmes need their own local data.
 
