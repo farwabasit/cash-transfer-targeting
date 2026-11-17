@@ -12,7 +12,9 @@ APP = ROOT / "app"
 sys.path.insert(0, str(APP))
 
 bad = []
-for f in list(APP.rglob("*.py")) + list((ROOT / "analysis").glob("*.py")) + list((ROOT / "ingestion").glob("*.py")):
+code = [APP.rglob("*.py"), (ROOT / "analysis").glob("*.py"), (ROOT / "ingestion").glob("*.py"),
+        (ROOT / "airflow" / "dags").glob("*.py"), (ROOT / "scripts").glob("*.py")]
+for f in [p for group in code for p in group]:
     try:
         ast.parse(f.read_text(encoding="utf-8"))
     except SyntaxError as e:
