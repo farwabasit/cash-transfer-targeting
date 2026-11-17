@@ -1,0 +1,12 @@
+# mount the whole repo into the airflow containers so the DAG runs the same code as everywhere else.
+# data/ and .secrets/ are on the laptop only (git-ignored)
+services:
+  scheduler:
+    volumes:
+      - ..:/usr/local/airflow/project
+  dag-processor:
+    volumes:
+      - ..:/usr/local/airflow/project
+  triggerer:
+    volumes:
+      - ..:/usr/local/airflow/project
