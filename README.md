@@ -22,7 +22,8 @@ Dataverse files (.dta, also read from inside zips)
   -> dbt: bronze -> silver -> gold   (61 tests, data contracts)
   -> Python analysis (ANCOVA, causal forest with EconML, budget simulation) -> Snowflake ML
   -> Streamlit app (read-only Snowflake user)
-CI/CD: GitHub Actions runs dbt build + tests on every push and every Monday
+CI/CD: GitHub Actions runs dbt build + tests on every branch (CI_ schemas) and on main every Monday
+Airflow (Astro + Cosmos): the same pipeline as one DAG, every dbt model and test as its own task
 ```
 
 The pipeline is built for new survey waves. Every file is loaded once (tracked by hash in `RAW._LOAD_LOG`). New columns in a later wave are added to the table instead of breaking the load.
@@ -35,6 +36,7 @@ The pipeline is built for new survey waves. Every file is loaded once (tracked b
 | `transform/` | dbt project (bronze / silver / gold), seeds and custom tests |
 | `analysis/` | Effects per household type, causal forest, budget simulation, 6 graduation countries |
 | `app/` | Streamlit app |
+| `airflow/` | Astro project: DAG that runs loader -> dbt (Cosmos) -> analysis |
 | `prototypes/` | First Python version of the Uganda consumption total (the dbt model is checked against it) |
 | `scripts/` | Check that dbt matches the prototype |
 
@@ -59,6 +61,13 @@ python analysis/run_analysis.py             # results -> Snowflake ML schema
 pip install -r requirements-app.txt
 streamlit run app/streamlit_app.py
 ```
+Airflow (needs Docker Desktop and the Astro CLI):
+```bash
+python transform/run_dbt.py parse           # fresh dbt manifest for Cosmos
+cd airflow && astro dev start               # UI on http://localhost:8080, DAG: cash_transfer_pipeline
+```
+The repo is mounted into the containers. `airflow/.env` (git-ignored) holds the Snowflake settings.
+
 With Docker:
 ```bash
 docker build -t ct-ingest .

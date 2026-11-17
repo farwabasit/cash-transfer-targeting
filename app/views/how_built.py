@@ -13,7 +13,8 @@ st.code(
     "  -> dbt bronze (views)  -> dbt silver (clean, 1 row per household)  -> dbt gold (types, effects, spending)\n"
     "  -> Python analysis (ANCOVA, causal forest, budget simulation) -> Snowflake ML\n"
     "  -> Streamlit app\n"
-    "GitHub Actions: dbt build + tests on every push and every Monday",
+    "GitHub Actions: dbt build + tests on every branch (in CI_ schemas) and on main every Monday\n"
+    "Airflow (Astro + Cosmos): the same steps as one DAG, 39 tasks (every dbt model and test is a task)",
     language=None)
 
 c1, c2, c3, c4 = st.columns(4)
@@ -54,7 +55,10 @@ st.dataframe(pd.DataFrame([
     ["Cost", "X-Small warehouse, 60 s auto-suspend, resource monitor", "Free trial credits last; nothing runs idle"],
     ["Transformation", "dbt (bronze/silver/gold)", "Version control + tests + lineage + contracts"],
     ["Item list", "Seed file, checked against each wave's columns", "Questionnaires change between waves"],
-    ["Orchestration", "GitHub Actions (not Airflow)", "8 GB laptop; one pipeline; runs in the cloud for free"],
+    ["Orchestration", "GitHub Actions for the schedule, Airflow DAG with Cosmos as well",
+     "Actions runs in the cloud for free. Airflow shows every dbt model as a task with retries; runs locally in Docker"],
+    ["Airflow on 8 GB", "Max 2 tasks at a time, 2 retries, dbt read from the manifest",
+     "First run overloaded the laptop and dropped 3 task statuses; this fixed it"],
     ["Model", "Simple types first, causal forest as a check", "Easy to explain to an NGO; small samples"],
     ["App", "Streamlit on the gold + ML schemas", "NGO can upload its own households"],
 ], columns=["Decision", "My Choice", "Why"]), hide_index=True, width="stretch")
