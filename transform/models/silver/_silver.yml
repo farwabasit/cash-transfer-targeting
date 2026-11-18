@@ -18,8 +18,6 @@ models:
 
   - name: slv_uganda_household_consumption
     description: Monthly consumption per person in UGX and PPP $, top 1% winsorised per wave.
-    config:
-      contract: {enforced: true}
     tests:
       - unique_combination: {arguments: {columns: [household_id, wave]}}
     columns:
@@ -82,8 +80,6 @@ models:
     description: >
       One row per Kenya household. arm = treatment, spillover (not treated but in a treatment
       village) or pure_control (control villages, no baseline survey).
-    config:
-      contract: {enforced: true}
     columns:
       - name: household_id
         data_type: varchar

@@ -23,7 +23,7 @@ c1, c2, c3, c4 = st.columns(4)
 c1.metric("dbt models", "17")
 c2.metric("Data tests", "68")
 c3.metric("Seeds", "7")
-c4.metric("Contracts", "3")
+c4.metric("Contracts", "5")
 
 st.page_link("views/dbt_docs.py", label="Open the data catalogue with the lineage graph (dbt docs)",
              icon=":material/menu_book:")
@@ -45,7 +45,7 @@ st.markdown(
     "- **68 tests** across all layers: not_null, unique, accepted_values, relationships\n"
     "- **Custom tests**: `in_range` (no negative spending, food share between 0 and 1) and "
     "`unique_combination` (checks the grain of every model)\n"
-    "- **Data contracts** on the main household tables: column names and types are fixed\n"
+    "- **Data contracts** on all 5 gold tables, the layer the app reads: column names and types are fixed\n"
     "- **Reconciliation test**: the dbt SQL is compared with the Python prototype household by household\n"
     "- **Live check**: the PPP factors pinned for the analysis are compared with the World Bank API on every build "
     "(warns above 2%). Pinned for reproducible results, monitored against the live source\n"
@@ -58,7 +58,9 @@ st.dataframe(pd.DataFrame([
     ["Login", "Key-pair service user", "No password in code; least-privilege role only for this project"],
     ["Cost", "X-Small warehouse, 60 s auto-suspend, resource monitor", "Free trial credits last; nothing runs idle"],
     ["Transformation", "dbt (bronze/silver/gold)", "Version control + tests + lineage + contracts"],
-    ["Item list", "Seed file, checked against each wave's columns", "Questionnaires change between waves"],
+    ["Item list", "Seed file joined to the survey answers with FLATTEN (plain SQL, no Jinja)",
+     "Questionnaires change between waves. A dbt engineer advised Snowflake SQL over Jinja: no extra database call"],
+    ["Contracts", "On the gold layer only", "Gold is what the app depends on (advice from the same dbt engineer)"],
     ["Orchestration", "GitHub Actions for the schedule, Airflow DAG with Cosmos as well",
      "Actions runs in the cloud for free. Airflow shows every dbt model as a task with retries; runs locally in Docker"],
     ["Airflow on 8 GB", "Max 2 tasks at a time, 2 retries, dbt read from the manifest",

@@ -51,38 +51,137 @@ models:
 
   - name: gld_effects_by_type
     description: Effect of cash per country and household type, ROI and poverty metrics.
+    config:
+      contract: {enforced: true}
     tests:
       - unique_combination: {arguments: {columns: [country, household_type]}}
     columns:
-      - name: n_control
-        tests:
-          - in_range: {arguments: {min_value: 30}}   # too few households makes the comparison meaningless
+      - name: country
+        data_type: varchar
+      - name: household_type
+        data_type: varchar
+      - name: household_type_label
+        data_type: varchar
       - name: n_treatment
+        data_type: number
         tests:
           - in_range: {arguments: {min_value: 30}}
+      - name: n_control
+        data_type: number
+        tests:
+          - in_range: {arguments: {min_value: 30}}   # too few households makes the comparison meaningless
+      - name: mean_pc_control
+        data_type: float
+      - name: mean_pc_treatment
+        data_type: float
+      - name: gain_pc_ppp
+        data_type: float
+      - name: gain_pc_se
+        data_type: float
+      - name: gain_pc_ci_low
+        data_type: float
+      - name: gain_pc_ci_high
+        data_type: float
+      - name: gain_pct
+        data_type: float
+      - name: gain_pct_se
+        data_type: float
+      - name: mean_hh_size_treatment
+        data_type: float
+      - name: mean_transfer_ppp
+        data_type: float
+      - name: monthly_gain_per_100_ppp
+        data_type: float
       - name: share_poor_control
+        data_type: number
         tests:
           - in_range: {arguments: {min_value: 0, max_value: 1}}
-
+      - name: share_poor_treatment
+        data_type: number
+      - name: poverty_reduction_pp
+        data_type: number
+      - name: cost_per_household_lifted_ppp
+        data_type: float
+      - name: poverty_gap_control
+        data_type: float
+      - name: poverty_gap_treatment
+        data_type: float
+      - name: poverty_gap_reduction
+        data_type: float
+      - name: poverty_line_comparable
+        data_type: boolean
   - name: gld_household_spending
     description: Endline spending per person per month by spending group (PPP $), one row per household and group.
+    config:
+      contract: {enforced: true}
     tests:
       - unique_combination: {arguments: {columns: [country, household_id, spend_group]}}
     columns:
+      - name: household_id
+        data_type: varchar
+      - name: country
+        data_type: varchar
+      - name: spend_group
+        data_type: varchar
       - name: spend_pc_ppp
+        data_type: float
         tests:
           - in_range: {arguments: {min_value: 0}}
-
   - name: gld_spending_by_type
     description: Where the money went. Average spending per person with and without cash, by country, type and group.
+    config:
+      contract: {enforced: true}
     tests:
       - unique_combination: {arguments: {columns: [country, household_type, spend_group]}}
-
+    columns:
+      - name: country
+        data_type: varchar
+      - name: household_type
+        data_type: varchar
+      - name: spend_group
+        data_type: varchar
+      - name: mean_spend_treatment
+        data_type: float
+      - name: mean_spend_control
+        data_type: float
+      - name: extra_spend_pc_ppp
+        data_type: float
   - name: gld_graduation_outcomes
     description: Graduation households in 6 countries with poverty group (poorer / less poor half within country) and capped consumption.
+    config:
+      contract: {enforced: true}
     tests:
       - unique_combination: {arguments: {columns: [country, household_id]}}
     columns:
+      - name: country
+        data_type: varchar
+      - name: household_id
+        data_type: varchar
+      - name: country_name
+        data_type: varchar
+      - name: treated
+        data_type: number
+      - name: consumption_pc_bl
+        data_type: float
+      - name: consumption_pc_end
+        data_type: float
+      - name: consumption_pc_fup
+        data_type: float
+      - name: asset_value_bl
+        data_type: float
+      - name: asset_value_end
+        data_type: float
+      - name: asset_value_fup
+        data_type: float
+      - name: consumption_pc_bl_w
+        data_type: float
+      - name: consumption_pc_end_w
+        data_type: float
+      - name: consumption_pc_fup_w
+        data_type: float
+      - name: median_consumption_pc_bl
+        data_type: float
       - name: poverty_group
+        data_type: varchar
         tests:
           - accepted_values: {arguments: {values: [poorer, less_poor]}}
