@@ -20,7 +20,7 @@ NGOs and funders that give cash have a fixed budget and more poor households tha
 Dataverse files (.dta, also read from inside zips)
   -> Python loader (Docker) -> Snowflake RAW
 World Bank API (PPP, exchange rates, CPI) -> loader with retries -> Snowflake RAW
-  -> dbt: bronze -> silver -> gold   (68 tests, data contracts)
+  -> dbt: bronze -> silver -> gold   (68 tests, contracts on gold)
   -> Python analysis (ANCOVA, causal forest with EconML, budget simulation) -> Snowflake ML
   -> Streamlit app (read-only Snowflake user)
 CI/CD: GitHub Actions runs dbt build + tests on every branch (CI_ schemas) and on main every Monday
