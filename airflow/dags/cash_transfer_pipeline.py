@@ -1,6 +1,6 @@
 """The whole pipeline as one Airflow DAG:
 
-    load raw survey files -> dbt (every model and its tests as tasks, via Cosmos) -> python analysis
+    load raw survey files + world bank prices -> dbt (every model and its tests as tasks, via Cosmos) -> python analysis
 
 Runs locally with the Astro CLI (astro dev start). The repo is mounted at /usr/local/airflow/project,
 dbt and the analysis each have their own virtual environment in the image (see airflow/Dockerfile).
@@ -47,6 +47,11 @@ def cash_transfer_pipeline():
         bash_command=f"cd {PROJECT} && {PY} ingestion/load_raw.py",
     )
 
+    load_worldbank = BashOperator(
+        task_id="load_worldbank_prices",
+        bash_command=f"cd {PROJECT} && {PY} ingestion/load_worldbank.py",
+    )
+
     dbt = DbtTaskGroup(
         group_id="dbt",
         # read the dbt graph from the manifest (fast). refresh it with: python transform/run_dbt.py parse
@@ -62,7 +67,7 @@ def cash_transfer_pipeline():
         bash_command=f"cd {PROJECT} && {PY} analysis/run_analysis.py",
     )
 
-    load_raw >> dbt >> analysis
+    [load_raw, load_worldbank] >> dbt >> analysis
 
 
 cash_transfer_pipeline()

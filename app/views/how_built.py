@@ -9,6 +9,8 @@ st.subheader("Medallion Architecture - End to End")
 st.code(
     "Survey files (.dta, Harvard Dataverse)\n"
     "  -> Python loader in Docker (skips files already loaded, adds new columns)\n"
+    "World Bank API (PPP, exchange rates, CPI for 8 countries)\n"
+    "  -> API loader (timeouts, retries, merge on country + indicator + year)\n"
     "  -> Snowflake RAW\n"
     "  -> dbt bronze (views)  -> dbt silver (clean, 1 row per household)  -> dbt gold (types, effects, spending)\n"
     "  -> Python analysis (ANCOVA, causal forest, budget simulation) -> Snowflake ML\n"
@@ -18,8 +20,8 @@ st.code(
     language=None)
 
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("dbt models", "15")
-c2.metric("Data tests", "61")
+c1.metric("dbt models", "17")
+c2.metric("Data tests", "68")
 c3.metric("Seeds", "7")
 c4.metric("Contracts", "3")
 
@@ -40,11 +42,13 @@ st.dataframe(pd.DataFrame([
 
 st.subheader("Layered Data Quality Testing")
 st.markdown(
-    "- **61 tests** across all layers: not_null, unique, accepted_values, relationships\n"
+    "- **68 tests** across all layers: not_null, unique, accepted_values, relationships\n"
     "- **Custom tests**: `in_range` (no negative spending, food share between 0 and 1) and "
     "`unique_combination` (checks the grain of every model)\n"
     "- **Data contracts** on the main household tables: column names and types are fixed\n"
     "- **Reconciliation test**: the dbt SQL is compared with the Python prototype household by household\n"
+    "- **Live check**: the PPP factors pinned for the analysis are compared with the World Bank API on every build "
+    "(warns above 2%). Pinned for reproducible results, monitored against the live source\n"
     "- **Source freshness**: warns if no new survey wave has arrived in a year"
 )
 

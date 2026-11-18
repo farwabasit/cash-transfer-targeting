@@ -165,3 +165,16 @@ models:
       - name: consumption_pc_bl
         tests:
           - in_range: {arguments: {min_value: 0}}
+
+  # reference data
+  - name: slv_worldbank_prices
+    description: World Bank PPP factor, exchange rate and CPI per country and year, from the live API.
+    tests:
+      - unique_combination: {arguments: {columns: [country, year]}}
+    columns:
+      - name: ppp_lcu_per_intl_dollar
+        tests:
+          - in_range: {arguments: {min_value: 0}}
+      - name: lcu_per_usd
+        tests:
+          - in_range: {arguments: {min_value: 0}}

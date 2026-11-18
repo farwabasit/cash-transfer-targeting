@@ -40,6 +40,10 @@ jobs:
           mkdir -p .secrets
           printf '%s\n' "$KEY" > .secrets/snowflake_key.p8
 
+      - name: load world bank prices (main only, branches read the same raw table)
+        if: github.ref == 'refs/heads/main'
+        run: python ingestion/load_worldbank.py
+
       - name: dbt build (models + tests) on ${{ env.DBT_TARGET }}
         run: python transform/run_dbt.py build --target "$DBT_TARGET"
 
