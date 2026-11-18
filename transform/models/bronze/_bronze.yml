@@ -9,3 +9,5 @@ models:
     description: Raw Uganda endline survey (Feb-Apr 2022) as a view. BL_ONLY = 1 marks households not found at endline.
   - name: brz_graduation_pooled_hh
     description: Raw graduation programme file (6 countries) as a view.
+  - name: brz_worldbank_indicators
+    description: World Bank price data as a view, long format (one row per country, indicator and year).

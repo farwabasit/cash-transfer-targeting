@@ -29,5 +29,12 @@ sources:
         columns:
           - name: ID
             tests: [not_null, unique]
+      - name: WORLDBANK_INDICATORS
+        description: World Bank API (PPP factor, exchange rate, CPI) loaded by ingestion/load_worldbank.py. Merged on country, indicator and year.
+        freshness:
+          warn_after: {count: 35, period: day}
+        columns:
+          - name: VALUE
+            tests: [not_null]
       - name: _LOAD_LOG
         description: One row per loaded file (hash, rows, new columns) for incremental loads
