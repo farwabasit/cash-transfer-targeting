@@ -25,7 +25,6 @@ e["order"] = e.household_type.map({"ALL": 0, "A": 1, "B": 2, "C": 3, "D": 4})
 e["name"] = e.apply(lambda r: "All" if r.household_type == "ALL" else f"{r.household_type}: {r.label}", axis=1)
 
 st.subheader("Which type gains most?")
-st.caption("Dot = estimated gain, line = 95% range. If the line crosses 0 we can't be sure there is a gain.")
 base = alt.Chart(e).encode(y=alt.Y("name:N", sort=alt.SortField("order"), title=None, axis=alt.Axis(labelLimit=260)))
 tooltip = [alt.Tooltip("name:N", title="Type"), alt.Tooltip("effect_pct:Q", title="Gain", format="+.0%"),
            alt.Tooltip("ci_low_pct:Q", title="Range from", format="+.0%"),
@@ -38,6 +37,9 @@ rules = base.mark_rule(strokeWidth=2, color=color).encode(
 dots = base.mark_circle(size=120, color=color, opacity=1).encode(x="effect_pct:Q", tooltip=tooltip)
 zero = alt.Chart().mark_rule(color=data.CONTROL_GREY, strokeDash=[4, 4]).encode(x=alt.datum(0))
 st.altair_chart((zero + rules + dots).properties(height=260), width="stretch")
+data.how_to_read("Each row is one household type. The dot is how much more households with cash consumed than "
+                 "similar households without cash. The line is the 95% range. If the line crosses the dashed 0 line "
+                 "we can't be sure that type gained. A dot further right means a bigger gain.")
 
 show = e.sort_values("order")[["name", "n", "effect_pct", "ci_low_pct", "ci_high_pct", "monthly_gain_per_100", "p_value"]]
 st.dataframe(show, hide_index=True, width="stretch", column_config={
@@ -72,3 +74,5 @@ chart = alt.Chart(long).mark_bar(cornerRadiusEnd=4, height=14).encode(
              alt.Tooltip("share:Q", format=".0%", title="Share")],
 ).properties(height=260)
 st.altair_chart(chart, width="stretch")
+data.how_to_read("Grey bar = the type's share of all households. Coloured bar = its share of the model's top 25% "
+                 "gainers. If the coloured bar is longer than the grey one the model also thinks this type gains more.")

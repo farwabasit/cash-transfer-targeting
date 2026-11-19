@@ -32,6 +32,10 @@ labels = (base.transform_filter("datum.share_poorest_half <= 0.75").mark_text(al
           + base.transform_filter("datum.share_poorest_half > 0.75").mark_text(align="right", dx=-10, fontSize=13).encode(text="rule:N"))
 zero = alt.Chart().mark_rule(color=data.CONTROL_GREY, strokeDash=[4, 4]).encode(y=alt.datum(0))
 st.altair_chart((zero + pts + labels).properties(height=380), width="stretch")
+data.how_to_read("Each dot is one way of choosing who gets cash. Higher up = more extra consumption for every $100 "
+                 "given. Further right = more of the chosen households come from the poorest half. The best rule "
+                 "would sit top right. When the highest dot is far left, more impact means reaching fewer of the "
+                 "poorest: that is the trade-off.")
 
 st.dataframe(b[["rule", "monthly_gain_per_100", "effect_pct", "ci_low", "ci_high", "share_poorest_half", "n"]],
              hide_index=True, width="stretch", column_config={

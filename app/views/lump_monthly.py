@@ -43,6 +43,9 @@ for outcome, question in [("Consumption per person per month", "Which Design Rai
                  x2="high:Q", tooltip=tip)
              + base.mark_circle(size=110, opacity=1).encode(x="gain:Q", tooltip=tip))
     st.altair_chart(chart.properties(height=240), width="stretch")
+    data.how_to_read("Each group has two rows, one per payment design (see the colours at the top). The dot is the "
+                     "gain compared with households that got no cash. The line is the 95% range. If the two lines "
+                     "overlap a lot the two designs are not clearly different.")
 
 table = lm[["outcome", "group", "lump_pct", "monthly_pct", "lump_minus_monthly", "diff_ci_low", "diff_ci_high", "diff_p_value"]]
 st.dataframe(table, hide_index=True, width="stretch", column_config={
