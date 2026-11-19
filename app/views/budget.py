@@ -43,11 +43,16 @@ st.dataframe(b[["rule", "monthly_gain_per_100", "effect_pct", "ci_low", "ci_high
                  "share_poorest_half": st.column_config.NumberColumn("Poorest half reached", format="percent"),
                  "n": "Households"})
 
+st.caption("The random rule is one random draw. It moves a little each time the analysis runs. The stable "
+           "benchmark is the average for all households.")
+avg = data.effects().query("country == @code and household_type == 'ALL'").monthly_gain_per_100.iloc[0]
+by_type = b.set_index("rule").loc["By household type"]
 if code == "UGA":
     st.warning(
-        "In Uganda, choosing by household type gives about 5x more impact per dollar than choosing at random, "
-        "but only about 1 in 5 chosen households come from the poorest half. More impact or reaching the "
-        "poorest: that is a values choice for the programme."
+        f"In Uganda, choosing by household type gives ${by_type.monthly_gain_per_100:.2f} per $100, about "
+        f"{by_type.monthly_gain_per_100 / avg:.0f}x the average of ${avg:.2f}. But only "
+        f"{by_type.share_poorest_half:.0%} of the chosen households come from the poorest half. More impact or "
+        "reaching the poorest: that is a values choice for the programme."
     )
 else:
     st.success("In Kenya there is no trade-off: giving to the poorest first also gives the most impact per dollar.")
