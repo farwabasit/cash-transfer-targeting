@@ -74,8 +74,8 @@ st.markdown(
     "- **Lump sum or monthly:** both raise spending about the same, a lump sum builds more assets (Kenya).\n"
     "- **In Uganda the less poor gained most:** +21% and +27% for the less poor types. In Kenya the poorer, larger "
     "households gained +27%, but the difference with the less poor is not clear.\n"
-    "- **Targeting by type pays off in Uganda:** $11.80 extra per month for every $100, against about $2 when "
-    "picking at random.\n"
+    "- **Targeting by type pays off in Uganda:** about $15 extra per month for every $100, about twice the $7.56 average "
+    "for all households.\n"
     "- **But it skips the poorest:** only 19% of the households it picks come from the poorest half.\n"
     "- **A model from one country doesn't work in the other:** Kenya's model could not find Uganda's top gainers."
 )
