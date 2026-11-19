@@ -34,6 +34,9 @@ dots = alt.Chart(long).mark_circle(size=120, opacity=1).encode(
     color=alt.Color("half:N", scale=halves, legend=alt.Legend(title=None, orient="top")), tooltip=tip)
 zero = alt.Chart().mark_rule(color=data.CONTROL_GREY, strokeDash=[4, 4]).encode(x=alt.datum(0))
 st.altair_chart((zero + line + dots).properties(height=330), width="stretch")
+data.how_to_read("Each row is one place. The two dots show the gain for the poorer half and the less poor half. "
+                 "A long grey line between them means the halves gained very differently. Dots close together "
+                 "mean they gained about the same. The table below says if the difference is real.")
 
 st.dataframe(pv.sort_values(["programme", "place"])[["place", "programme", "n", "gain_pct_poorer", "gain_pct_less_poor",
                                                       "who_gains_more", "difference_p_value"]],
@@ -76,6 +79,9 @@ fp = (zero
                                            legend=None),
           color=alt.Color("kind:N", scale=kinds, legend=None), tooltip=tip_f))
 st.altair_chart(fp.properties(height=330), width="stretch")
+data.how_to_read("Each row is the gap between the two halves in one place. Right of the dashed 0 line = the poorer "
+                 "half gained more. Left = the less poor half gained more. The diamond at the bottom combines all 8 "
+                 "places. Its line crosses 0. So on average there is no clear difference.")
 st.success(
     f"**On average the poorer and the less poor half gained about the same.** Across {int(allgap.households):,} "
     f"households the gap is {allgap.random * 100:+.1f} points. The 95% range ({allgap.ci_low * 100:+.1f} to "
@@ -109,6 +115,9 @@ st.altair_chart((zero + base.mark_rule(strokeWidth=2).encode(
     x=alt.X("ci_low_pct:Q", axis=alt.Axis(format="%", title="Gain in consumption per person (95% range)")),
     x2="ci_high_pct:Q", tooltip=tip_g) + base.mark_circle(size=100, opacity=1).encode(x="effect_pct:Q", tooltip=tip_g)
 ).properties(height=330), width="stretch")
+data.how_to_read("Each country has one row per survey round (about 2 and about 3 years after the start). The dot "
+                 "is the gain in consumption per person. The line is the 95% range. A line fully right of 0 means "
+                 "the programme clearly worked there.")
 st.markdown(
     "- **It worked clearly in Ethiopia (+16%), India (+12%) and Pakistan (+10%)** after about 2 years.\n"
     "- **Not in Honduras.** Unclear in Ghana and Peru (Peru turned positive by year 3).\n"

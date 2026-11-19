@@ -83,7 +83,6 @@ eff["gain_per_100_local"] = eff.gain_per_100 * rate  # per 100 local units given
 eff["small"] = eff[["n_treatment", "n_control"]].min(axis=1) < 30
 
 st.subheader("Who Gains Most in My Programme?")
-st.caption("Dot = estimated gain, line = 95% range. If the line crosses 0 we can't be sure there is a gain.")
 order = {"ALL": 0, "A": 1, "B": 2, "C": 3, "D": 4}
 eff["order"] = eff.type.map(order)
 base = alt.Chart(eff).encode(y=alt.Y("name:N", sort=alt.SortField("order"), title=None, axis=alt.Axis(labelLimit=260)))
@@ -97,6 +96,9 @@ chart = (alt.Chart().mark_rule(color=data.CONTROL_GREY, strokeDash=[4, 4]).encod
              x2="ci_high_pct:Q", tooltip=tip)
          + base.mark_circle(size=120, color=color, opacity=1).encode(x="effect_pct:Q", tooltip=tip))
 st.altair_chart(chart.properties(height=260), width="stretch")
+data.how_to_read("Each row is one household type in your file. The dot is how much more households with support "
+                 "consumed than those without. The line is the 95% range. If the line crosses the dashed 0 line "
+                 "we can't be sure that type gained.")
 
 st.dataframe(eff.sort_values("order")[["name", "n_treatment", "n_control", "effect_pct", "ci_low_pct",
                                        "ci_high_pct", "gain_per_100_local", "small"]],
@@ -122,6 +124,9 @@ labels = (bb.transform_filter("datum.share_poorest_half <= 0.75").mark_text(alig
           + bb.transform_filter("datum.share_poorest_half > 0.75").mark_text(align="right", dx=-10, fontSize=13).encode(text="rule:N"))
 st.altair_chart((alt.Chart().mark_rule(color=data.CONTROL_GREY, strokeDash=[4, 4]).encode(y=alt.datum(0))
                  + bb.mark_circle(size=160, color=color, opacity=1) + labels).properties(height=340), width="stretch")
+data.how_to_read("Each dot is one way of choosing who gets support. Higher up = more gain for every 100 given. "
+                 "Further right = more of the chosen households come from the poorest half. Compare the dots to "
+                 "see what you gain and what you give up with each rule.")
 st.caption("Budget for 30% of the households in the file. The type rule is learned on one half of the data and "
            "tested on the other half. That way it is not judged on the data it learned from.")
 

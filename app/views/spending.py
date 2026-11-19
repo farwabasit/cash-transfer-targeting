@@ -32,6 +32,9 @@ chart = alt.Chart(sp).mark_bar(cornerRadiusEnd=4, height=18, color=data.COUNTRY_
 )
 zero = alt.Chart().mark_rule(color=data.CONTROL_GREY).encode(x=alt.datum(0))
 st.altair_chart((zero + chart).properties(height=max(200, 34 * len(sp))), width="stretch")
+data.how_to_read("Each bar is how many dollars more per person per month households with cash spent on that "
+                 "category than households without cash. The longest bar is where most of the extra money went. "
+                 "A bar left of 0 means they spent less on it.")
 
 st.dataframe(sp.sort_values("extra_spend_pc_ppp", ascending=False)[
     ["group", "mean_spend_control", "mean_spend_treatment", "extra_spend_pc_ppp"]],

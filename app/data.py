@@ -30,6 +30,11 @@ def currency_inputs(key):
     return code, float(rate)
 
 
+def how_to_read(text):
+    # short plain-words guide under each chart (Pritha: make it more understandable)
+    st.caption(f":material/lightbulb: **How to read this:** {text}")
+
+
 def question_box(text):
     # the yellow "stakeholder question" box from my Apollo deck
     st.markdown(
