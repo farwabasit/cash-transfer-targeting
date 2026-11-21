@@ -1,9 +1,13 @@
+from pathlib import Path
+
 import pandas as pd
 import streamlit as st
 
 st.title("How It's Built")
 st.markdown("An automated pipeline from raw survey files to this app, built so a new survey wave or a new "
             "country can be added without rewriting anything.")
+
+st.image(str(Path(__file__).resolve().parents[1] / "static" / "pipeline.png"), width="stretch")
 
 st.subheader("Medallion Architecture - End to End")
 st.code(
