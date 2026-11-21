@@ -18,6 +18,8 @@ The data points that drive the analysis: consumption per person before and after
 - A model trained on Kenya could not find Uganda's top gainers. Programmes need their own local data.
 
 ## Architecture
+![Pipeline and analysis](app/static/pipeline.png)
+
 ```
 Dataverse files (.dta, also read from inside zips)
   -> Python loader (Docker) -> Snowflake RAW
