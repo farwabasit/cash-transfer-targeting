@@ -2,12 +2,14 @@
 
 **Live app: [cash-transfer-targeting.streamlit.app](https://cash-transfer-targeting.streamlit.app)**
 
-Which types of poor households gain the most from unconditional cash transfers? How can a programme with a fixed budget do the most good?
+Which types of households should get cash to get the biggest rise in living standards for every $100, without leaving the poorest behind?
 
 Final individual project, Data Analyst programme, Hyper Island, Stockholm (Nov 2026).
 
 ## The problem
-NGOs and funders that give cash have a fixed budget and more poor households than they can reach. This project uses open data from randomised GiveDirectly trials in Kenya (2011-12) and Uganda (2019-22) to group households into four simple types. It measures how much each type gains and what each $100 buys. A graduation programme in 6 countries (Ethiopia, Ghana, Honduras, India, Pakistan, Peru) is added as a comparison.
+Programmes that give cash (NGOs, UN partners and national governments building social protection systems) have a fixed budget and more poor households than they can reach. "Most good" here means the biggest rise in monthly consumption per person (PPP $) for every $100 given, while still reaching the poorest.
+
+The data points that drive the analysis: consumption per person before and after, whether a household was offered cash (by lottery), household size and the amount transferred. This project uses open data from randomised GiveDirectly trials in Kenya (2011-12) and Uganda (2019-22) to group households into four simple types. It measures how much each type gains and what each $100 buys. A graduation programme in 6 countries (Ethiopia, Ghana, Honduras, India, Pakistan, Peru) is added as a comparison.
 
 ## What I found
 - Cash raised consumption per person by about 17% in Kenya and 13% in Uganda.

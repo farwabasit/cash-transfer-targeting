@@ -8,13 +8,26 @@ st.markdown("##### Evidence from Kenya and Uganda on how the same support change
 
 st.subheader("Stakeholder Question")
 data.question_box(
-    "We have a fixed budget and more poor households than we can reach. "
-    "Which households should get cash so the money does the most good?")
+    "We have a fixed budget and more poor households than we can reach. Which types of households should get "
+    "cash to get the biggest rise in living standards for every $100, without leaving the poorest behind?")
+st.markdown(
+    "**\"Most good\" means:** the biggest rise in **monthly consumption per person** (what a household spends and "
+    "consumes, per person, in PPP dollars) for every **$100 given**, while still reaching the poorest households."
+)
+st.markdown(
+    "**The data points that drive the analysis:**\n"
+    "- **Consumption per person, before and after:** the outcome, measured in each household\n"
+    "- **Offered cash or not:** decided by lottery. That makes the two groups fair to compare\n"
+    "- **Household size** and **consumption before cash:** together they set the household type (A to D)\n"
+    "- **The amount transferred:** turns the gain into a return per $100"
+)
 
 st.subheader("Who Is This For?")
 st.markdown(
-    "**Programme managers and funders of cash programmes** (NGOs like GiveDirectly, Rädda Barnen and the Red Cross. "
-    "Funders like Sida, Postkodlotteriet and the IKEA Foundation).\n\n"
+    "**Implementing partners and national governments that run cash or graduation programmes:** NGOs like "
+    "GiveDirectly, Rädda Barnen and the Red Cross, UN partners and governments building their national social "
+    "protection systems, such as Kenya, Uganda and Pakistan. Funders like Sida, Postkodlotteriet and the IKEA "
+    "Foundation can use the results when they decide where their money does the most good.\n\n"
     "- **Before:** they choose households by need only and can't say what each $100 achieves for different households.\n"
     "- **With this tool:** they see which household types gain most, what the trade-off with reaching the poorest is "
     "and they can rank their own household list within their budget.\n\n"
